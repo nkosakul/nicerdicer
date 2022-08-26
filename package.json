@@ -9,11 +9,18 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "prepare": "husky install"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
   "lint-staged": {
     "src/**/*.{js,ts,vue}": [
-      "eslint --fix --max-warnings=0"
+      "eslint --fix --max-warnings=0",
+      "prettier . --write"
     ]
   },
   "dependencies": {
