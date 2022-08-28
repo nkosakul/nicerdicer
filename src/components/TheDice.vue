@@ -4,15 +4,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: "TheDice",
+  name: 'TheDice',
   data() {
     return {
       num: 0 as number,
-      isRolled: false as boolean
-    }
+      isRolled: false as boolean,
+    };
   },
   methods: {
     randomize(): number {
@@ -23,18 +23,16 @@ export default defineComponent({
       return random;
     },
     roll(): number {
-      if (! this.isRolled) {
+      if (!this.isRolled) {
         this.isRolled = true;
 
         return this.randomize();
       }
 
       return this.num;
-    }
-  }
-})
+    },
+  },
+});
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
