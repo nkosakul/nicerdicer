@@ -6,14 +6,21 @@ export function randomize(): number {
 // calculate column by game logic
 export function sumColumn(_input: number[]): number {
   return _input.reduce((_not_sure, _count, _num) => {
-    if (_count === 1 || _num === 1) {
+    if (_count === 1) {
       _not_sure += _num;
+      return _not_sure;
     }
     if (_count === 2) {
+      if (_num === 1) {
+        _not_sure += _num + _num;
+        return _not_sure;
+      }
       _not_sure += _num * _num;
+      return _not_sure;
     }
     if (_count === 3) {
       _not_sure += _num * 9;
+      return _not_sure;
     }
 
     return _not_sure;
