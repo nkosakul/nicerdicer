@@ -1,7 +1,7 @@
 <template>
-  <h1>The Player</h1>
-  <button @click="roll">You can roll this once!</button>
-  <div>{{ rolledValue }}</div>
+  <h2 style="color: blue">{{ name }}</h2>
+  <button :disabled="!isPlayerTurn" @click="roll">ROLL!</button>
+  <div style="padding: 5px">{{ rolledValue }}</div>
   <div class="dice"></div>
 
   <TheBoard
@@ -27,15 +27,23 @@ import TheBoard from './TheBoard.vue';
 
 export default defineComponent({
   name: 'ThePlayer',
+  emits: ['playedMyTurn'],
   components: {
     TheBoard,
   },
+  props: {
+    isPlayerTurn: Boolean,
+    name: { type: String, default: 'Player' },
+  },
   data() {
     return {
-      playedTurn: false as boolean,
       rolledValue: 0 as number,
       board: [[], [], []] as Array<Array<number>>,
-      rotatedBoard: [[], [], []] as Array<Array<number>>,
+      rotatedBoard: [
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+      ] as Array<Array<number>>,
       sum: 0 as number,
       selectedCol: 0 as number,
       columnOneSum: 0 as number,
@@ -46,8 +54,7 @@ export default defineComponent({
   methods: {
     // roll the dice and set rolledValue
     roll(): number {
-      if (!this.playedTurn) {
-        this.playedTurn = true;
+      if (this.isPlayerTurn && this.rolledValue === 0) {
         this.rolledValue = randomize();
 
         return this.rolledValue;
@@ -62,6 +69,7 @@ export default defineComponent({
       if (success) {
         this.reset();
         this.calculateSum();
+        this.$emit('playedMyTurn');
       }
     },
     // push dice in column array
@@ -101,7 +109,6 @@ export default defineComponent({
     },
     // reset the dice
     reset() {
-      this.playedTurn = false; // should change when other player plays.
       this.rolledValue = 0;
     },
   },

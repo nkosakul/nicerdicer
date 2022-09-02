@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import ThePlayer from './components/ThePlayer.vue';
+import TheWorld from './components/TheWorld.vue';
 </script>
 
 <template>
   <h1>LETS GO!</h1>
-  <ThePlayer />
+  <TheWorld />
 </template>

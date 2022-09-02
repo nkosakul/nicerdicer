@@ -1,27 +1,33 @@
 <template>
-  <h1>The Board</h1>
+  <h3>The Board</h3>
   <div>
-    <button @click="setOnBoard(0)">Push In Column 1</button>
-    <button @click="setOnBoard(1)">Push In Column 2</button>
-    <button @click="setOnBoard(2)">Push In Column 3</button>
+    <button @click="setOnBoard(0)">1</button>
+    <button @click="setOnBoard(1)">2</button>
+    <button @click="setOnBoard(2)">3</button>
 
     <table>
       <tbody>
         <tr>
-          <th>{{ columnOneSum }}</th>
-          <th>{{ columnTwoSum }}</th>
-          <th>{{ columnThreeSum }}</th>
+          <th style="padding: 5px">{{ columnOneSum }}</th>
+          <th style="padding: 5px">{{ columnTwoSum }}</th>
+          <th style="padding: 5px">{{ columnThreeSum }}</th>
         </tr>
 
         <tr v-for="(columns, index) in rotatedViewBoard" :key="index">
-          <td v-for="(cell, subindex) in columns" :key="subindex">
+          <td
+            v-for="(cell, subindex) in columns"
+            :key="subindex"
+            style="padding: 5px"
+          >
             {{ cell }}
           </td>
         </tr>
       </tbody>
     </table>
 
-    <div>board sum: {{ sum }}</div>
+    <div>
+      <b>Sum: {{ sum }}</b>
+    </div>
   </div>
 </template>
 
@@ -43,7 +49,11 @@ export default defineComponent({
       // data structure is array of arrays with push and pop
       type: Array<Array<number>>,
       default: function () {
-        return [[], [], []];
+        return [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+        ];
       },
     },
     sum: {
