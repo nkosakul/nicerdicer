@@ -9,7 +9,7 @@ const routes = [
   {
     path: '/game/:gameId',
     name: 'game',
-    component: () => import('@/views/GameScreen.vue'),
+    component: () => import('@/views/TheGame.vue'),
   },
   {
     path: '/manual',
