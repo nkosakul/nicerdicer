@@ -1,11 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-const WelcomeScreen = () => import('@/views/WelcomeScreen.vue');
-const GameScreen = () => import('@/views/GameScreen.vue');
-
 const routes = [
-  { path: '/', name: 'Welcome', component: WelcomeScreen },
-  { path: '/game/:gameId', name: 'Gameboard', component: GameScreen },
+  {
+    path: '/',
+    name: 'home',
+    component: () => import('@/views/WelcomeScreen.vue'),
+  },
+  {
+    path: '/game/:gameId',
+    name: 'gameboard',
+    component: () => import('@/views/GameScreen.vue'),
+  },
+  {
+    path: '/manual',
+    name: 'manual',
+    component: () => import('@/views/ManualScreen.vue'),
+  },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ];
 
