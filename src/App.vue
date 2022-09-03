@@ -1,10 +1,14 @@
 <template>
   <app-header></app-header>
-  <TheWorld />
-  <router-view></router-view>
+
+  <main class="mt-10">
+    <router-view></router-view>
+  </main>
+
+  <app-footer></app-footer>
 </template>
 
 <script setup lang="ts">
 import AppHeader from '@/components/AppHeader.vue';
-import TheWorld from './components/TheWorld.vue';
+import AppFooter from '@/components/AppFooter.vue';
 </script>

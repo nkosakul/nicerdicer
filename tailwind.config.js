@@ -6,6 +6,11 @@ module.exports = {
     fontFamily: {
       sans: ['sans-serif'],
     },
+    extend: {
+      colors: {
+        ci: '#38bdf8', // TODO: replace color when we have real ci colors
+      },
+    },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/typography')],
 };

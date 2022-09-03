@@ -8,7 +8,7 @@ const routes = [
   },
   {
     path: '/game/:gameId',
-    name: 'gameboard',
+    name: 'game',
     component: () => import('@/views/GameScreen.vue'),
   },
   {
