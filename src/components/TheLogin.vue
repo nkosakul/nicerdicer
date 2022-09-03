@@ -81,7 +81,7 @@ export default {
           throw er;
         }
 
-        store.user = user || {};
+        store.user = user;
       } catch (error) {
         const e = error as Error;
         alert(e.message);
@@ -102,7 +102,7 @@ export default {
         const signedIn = await supabase.auth.signIn({
           refreshToken: data?.refresh_token,
         });
-        store.user = signedIn.user || {};
+        store.user = signedIn.user;
       } catch (error) {
         const e = error as Error;
         alert(e.message);
