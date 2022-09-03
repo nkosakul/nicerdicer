@@ -1,6 +1,8 @@
 <template>
   <TheGame v-if="store.user !== null && Object.keys(store.game).length === 0" />
-  <TheWorld v-if="Object.keys(store.game).length !== 0" />
+  <TheWorld
+    v-if="store.user !== null && Object.keys(store.game).length !== 0"
+  />
   <TheLogin v-if="store.user === null" />
   <button v-if="store.user !== null" @click="supabase.auth.signOut()">
     Logout
