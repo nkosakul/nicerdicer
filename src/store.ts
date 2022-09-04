@@ -4,5 +4,5 @@ import type { Game } from './d';
 
 export const store = reactive({
   user: null as User | null,
-  game: {} as Game,
+  game: { id: '', url: '' } as Game,
 });
