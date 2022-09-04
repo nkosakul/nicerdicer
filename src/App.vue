@@ -1,9 +1,7 @@
 <template>
   <app-header />
 
-  <main class="mt-10 container">
-    <router-view />
-  </main>
+  <main class="mt-10 container"></main>
 
   <app-footer />
 </template>

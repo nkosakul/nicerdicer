@@ -5,9 +5,7 @@
       A dice game, base on the mini-game "knucklebones" from the game "Cult of
       the lamp", which you can play with your friends (or enemies)!
       <br />
-      Make sure to
-      <router-link :to="{ name: 'manual' }">learn about the game</router-link>
-      first, before start playing!
+      Make sure to learn about the game first, before start playing!
     </p>
   </div>
 
