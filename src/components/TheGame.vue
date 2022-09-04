@@ -30,7 +30,7 @@ import { defineComponent } from 'vue';
 import GameRepository from '../repositories/GameRepository';
 import GameUserRepository from '../repositories/GameUserRepository';
 import LocalStorageRepository from '../repositories/LocalStorageRepository';
-import { store } from '../store';
+import { useGameStore } from '@/stores/gameStore';
 
 export default defineComponent({
   name: 'TheGame',
@@ -42,6 +42,7 @@ export default defineComponent({
       canCreateGame: true,
       localStorageGame: '',
       joinLink: '',
+      gameStore: useGameStore(),
     };
   },
   methods: {
@@ -55,17 +56,17 @@ export default defineComponent({
         if (error) throw error;
 
         if (data) {
-          store.game = data[0];
+          this.gameStore.setGame(data[0]);
           // insert game - user relation
-          const gameId = store.game?.id;
-          const userId = store.user?.id;
+          const gameId = this.gameStore.game?.id;
+          const userId = this.gameStore.user?.id;
           if (gameId && userId) {
             const { error } = await GameUserRepository.insertGameUser(
               gameId,
               userId
             );
             if (error) throw error;
-            this.gameLink = store.game?.url;
+            this.gameLink = this.gameStore.game?.url;
           }
           LocalStorageRepository.setLocalGame();
         }
@@ -89,7 +90,7 @@ export default defineComponent({
         // todo delete from database
         const error = await GameRepository.deleteGame(_game_id);
         if (error) throw error;
-        store.game = { id: '', url: '' };
+        this.gameStore.setGame({ id: '', url: '' });
         LocalStorageRepository.deleteLocalGame();
         this.gameLink = '';
 
@@ -101,11 +102,11 @@ export default defineComponent({
       }
     },
     async refreshList() {
-      this.listOfGames = await GameUserRepository.listGames(store.user?.id);
+      this.listOfGames = await GameUserRepository.listGames(this.gameStore.user?.id);
     },
     async refreshCanCreateGame() {
       this.canCreateGame = await GameUserRepository.canUserInsertGame(
-        store.user?.id
+        this.gameStore.user?.id
       );
     },
   },

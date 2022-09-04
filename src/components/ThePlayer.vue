@@ -22,8 +22,8 @@ import {
   randomize,
   rotateNestedArray,
   sumColumn,
-} from '../helpers/common';
-import TheBoard from './TheBoard.vue';
+} from '@/helpers/common';
+import TheBoard from '@/components/TheBoard.vue';
 
 export default defineComponent({
   name: 'ThePlayer',

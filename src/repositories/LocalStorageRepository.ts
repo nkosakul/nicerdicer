@@ -1,5 +1,5 @@
-import type { Game, LocalStorageSession } from '../d';
-import { store } from '../store';
+import type { Game, LocalStorageSession } from '@/d';
+import { useGameStore } from '@/stores/gameStore';
 
 class LocalStorageRepository {
   getLocalGame(): Game | null {
@@ -9,7 +9,8 @@ class LocalStorageRepository {
   }
 
   setLocalGame() {
-    localStorage.setItem('supabase_games', JSON.stringify(store.game));
+    const gameStore = useGameStore();
+    localStorage.setItem('supabase_games', JSON.stringify(gameStore.game));
   }
 
   deleteLocalGame() {

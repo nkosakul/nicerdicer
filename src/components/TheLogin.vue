@@ -55,13 +55,14 @@
 </template>
 
 <script lang="ts">
-import { store } from '@/store';
+import { useGameStore } from '@/stores/gameStore';
 import type { Session } from '@supabase/gotrue-js';
 import { ref } from 'vue';
-import { supabase } from '../supabase';
+import { supabase } from '@/supabase';
 
 export default {
   setup() {
+    const gameStore = useGameStore();
     const loading = ref(false);
     const name = ref('');
     const password = ref('');
@@ -82,7 +83,7 @@ export default {
           throw er;
         }
 
-        store.user = user;
+        gameStore.setUser(user);
       } catch (error) {
         const e = error as Error;
         alert(e.message);
@@ -106,7 +107,7 @@ export default {
           const signedIn = await supabase.auth.signIn({
             refreshToken: session.refresh_token,
           });
-          store.user = signedIn.user;
+          gameStore.setUser(signedIn.user);
           return;
         }
 

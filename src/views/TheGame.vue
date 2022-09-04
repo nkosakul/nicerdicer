@@ -1,16 +1,18 @@
 <template>
-  <TheGame v-if="store.user !== null && store.game.id === ''" />
-  <TheWorld v-if="store.user !== null && store.game.id !== ''" />
-  <TheLogin v-if="store.user === null" />
-  <button v-if="store.user !== null" @click="supabase.auth.signOut()">
+  <TheGame v-if="gameStore.user !== null && gameStore.game.id === ''" />
+  <TheWorld v-if="gameStore.user !== null && gameStore.game.id !== ''" />
+  <TheLogin v-if="gameStore.user === null" />
+  <button v-if="gameStore.user !== null" @click="supabase.auth.signOut()">
     Logout
   </button>
 </template>
 
 <script setup lang="ts">
-import { store } from '@/store';
 import { supabase } from '@/supabase';
-import TheGame from '../components/TheGame.vue';
-import TheLogin from '../components/TheLogin.vue';
-import TheWorld from '../components/TheWorld.vue';
+import { useGameStore } from '@/stores/gameStore';
+import TheGame from '@/components/TheGame.vue';
+import TheLogin from '@/components/TheLogin.vue';
+import TheWorld from '@/components/TheWorld.vue';
+
+const gameStore = useGameStore();
 </script>

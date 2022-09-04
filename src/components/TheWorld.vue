@@ -24,7 +24,7 @@
 import ThePlayer from '@/components/ThePlayer.vue';
 import { supabase } from '@/supabase';
 import { defineComponent } from 'vue';
-import LocalStorageRepository from '../repositories/LocalStorageRepository';
+import LocalStorageRepository from '@/repositories/LocalStorageRepository';
 
 export default defineComponent({
   name: 'TheWorld',
