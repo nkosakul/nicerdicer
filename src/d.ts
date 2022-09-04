@@ -5,6 +5,13 @@ export interface Game {
   url: string;
 }
 
+export interface GameUser {
+  id: string;
+  host_id: string;
+  game_id: string;
+  joiner_id: string;
+}
+
 export interface LocalStorageSession {
   currentSession: Record<'user', User>;
 }
