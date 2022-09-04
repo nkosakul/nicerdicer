@@ -26,11 +26,11 @@
 
 <script lang="ts">
 import type { Game, GameUser } from '@/d';
+import { useGameStore } from '@/stores/gameStore';
 import { defineComponent } from 'vue';
 import GameRepository from '../repositories/GameRepository';
 import GameUserRepository from '../repositories/GameUserRepository';
 import LocalStorageRepository from '../repositories/LocalStorageRepository';
-import { useGameStore } from '@/stores/gameStore';
 
 export default defineComponent({
   name: 'TheGame',
@@ -66,7 +66,7 @@ export default defineComponent({
               userId
             );
             if (error) throw error;
-            this.gameLink = this.gameStore.game?.url;
+            this.gameLink = this.gameStore.game?.url || '';
           }
           LocalStorageRepository.setLocalGame();
         }
@@ -90,7 +90,7 @@ export default defineComponent({
         // todo delete from database
         const error = await GameRepository.deleteGame(_game_id);
         if (error) throw error;
-        this.gameStore.setGame({ id: '', url: '' });
+        this.gameStore.setGame(null);
         LocalStorageRepository.deleteLocalGame();
         this.gameLink = '';
 

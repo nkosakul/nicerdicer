@@ -1,19 +1,19 @@
-import type { User } from '@supabase/supabase-js';
 import type { Game } from '@/d';
+import type { User } from '@supabase/supabase-js';
 import { defineStore } from 'pinia';
 
 export const useGameStore = defineStore('gameStore', {
   state: () => {
     return {
       user: null as User | null,
-      game: {} as Game,
+      game: null as Game | null,
     };
   },
   actions: {
     setUser(user: User | null) {
       this.user = user;
     },
-    setGame(game: Game) {
+    setGame(game: Game | null) {
       this.game = game;
     },
     deleteUser() {
@@ -24,7 +24,7 @@ export const useGameStore = defineStore('gameStore', {
     },
     resetGameStore() {
       this.user = null as User | null;
-      this.game = {} as Game;
+      this.game = null as Game | null;
     },
   },
 });
