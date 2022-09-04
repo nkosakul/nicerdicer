@@ -102,7 +102,9 @@ export default defineComponent({
       }
     },
     async refreshList() {
-      this.listOfGames = await GameUserRepository.listGames(this.gameStore.user?.id);
+      this.listOfGames = await GameUserRepository.listGames(
+        this.gameStore.user?.id
+      );
     },
     async refreshCanCreateGame() {
       this.canCreateGame = await GameUserRepository.canUserInsertGame(
