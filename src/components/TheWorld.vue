@@ -24,6 +24,7 @@
 import ThePlayer from '@/components/ThePlayer.vue';
 import { supabase } from '@/supabase';
 import { defineComponent } from 'vue';
+import LocalStorageRepository from '../repositories/LocalStorageRepository';
 
 export default defineComponent({
   name: 'TheWorld',
@@ -56,10 +57,8 @@ export default defineComponent({
   created() {
     const userId = supabase.auth.user()?.id;
     if (!userId) return;
-    const localSession = JSON.parse(
-      localStorage.getItem('supabase.auth.token') ?? ''
-    );
-    const localSessionUserId = localSession.currentSession?.user?.id || '';
+    const localSession = LocalStorageRepository.getLocalUserSession();
+    const localSessionUserId = localSession?.currentSession?.user?.id || '';
     if (userId === localSessionUserId) {
       this.localPlayer = localSessionUserId;
     }

@@ -56,6 +56,7 @@
 
 <script lang="ts">
 import { store } from '@/store';
+import type { Session } from '@supabase/gotrue-js';
 import { ref } from 'vue';
 import { supabase } from '../supabase';
 
@@ -92,17 +93,24 @@ export default {
 
     const handleSignUp = async () => {
       try {
-        // implement Captcha, data.user data.access_token
+        // todo implement honey pot
         const { data: data, error: error } =
           await supabase.auth.api.signUpWithEmail(
             name.value + '@xx.xxx',
             password.value
           );
         if (error) throw error;
-        const signedIn = await supabase.auth.signIn({
-          refreshToken: data?.refresh_token,
-        });
-        store.user = signedIn.user;
+
+        if (data && 'refresh_token' in data) {
+          const session = data as Session;
+          const signedIn = await supabase.auth.signIn({
+            refreshToken: session.refresh_token,
+          });
+          store.user = signedIn.user;
+          return;
+        }
+
+        // todo when it returns a user.
       } catch (error) {
         const e = error as Error;
         alert(e.message);
