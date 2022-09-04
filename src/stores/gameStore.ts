@@ -22,5 +22,9 @@ export const useGameStore = defineStore('gameStore', {
     deleteGame() {
       this.game = {} as Game;
     },
+    resetGameStore() {
+      this.user = null as User | null;
+      this.game = {} as Game;
+    },
   },
 });
