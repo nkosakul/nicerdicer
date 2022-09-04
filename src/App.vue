@@ -11,5 +11,5 @@
 <script setup lang="ts">
 import AppFooter from '@/components/AppFooter.vue';
 import AppHeader from '@/components/AppHeader.vue';
-import TheGame from '@/components/TheGame.vue';
+import TheGame from '@/views/TheGame.vue';
 </script>
