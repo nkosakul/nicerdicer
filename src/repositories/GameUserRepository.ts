@@ -70,6 +70,28 @@ class GameUserRepository {
 
     return false;
   }
+
+  async getOtherPlayer(
+    _game_id: string | undefined,
+    _user_id: string | undefined
+  ) {
+    if (_user_id == typeof undefined || _game_id == typeof undefined)
+      return false;
+
+    const { data } = await supabase
+      .from('games_profiles')
+      .select('joiner_id,host_id')
+      .eq('game_id', _game_id);
+    if (!data || data.length < 1) return null;
+
+    const host = data[0].host_id;
+    const joiner = data[0].joiner_id;
+
+    if (joiner === _user_id) return host;
+    if (host === _user_id) return joiner;
+
+    return null;
+  }
 }
 
 export default new GameUserRepository();

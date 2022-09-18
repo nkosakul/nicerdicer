@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   countOccurencesInArray,
+  removeTheVoid,
   rotateNestedArray,
   sumColumn,
 } from '../../helpers/common';
@@ -112,5 +113,34 @@ describe('test rotating nested arrays', () => {
       [2, 5, 8],
       [3, 6, 9],
     ]);
+  });
+
+  it('rotate twice back to original', () => {
+    const myArray = [
+      [0, 1, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+    ];
+
+    const rotated1 = rotateNestedArray(myArray);
+    const rotated2 = rotateNestedArray(rotated1);
+
+    expect(rotated2).toEqual([
+      [0, 1, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+    ]);
+  });
+
+  it('remove zeroes from board', () => {
+    const myArray = [
+      [1, 1, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+    ];
+
+    const emptiness = removeTheVoid(myArray);
+
+    expect(emptiness).toEqual([[1, 1], [], []]);
   });
 });

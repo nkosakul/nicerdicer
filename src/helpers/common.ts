@@ -38,3 +38,8 @@ export function countOccurencesInArray(_input: number[]): number[] {
 export function rotateNestedArray(_board: number[][]): number[][] {
   return _board.map((_, index) => _board.map(row => row[index] ?? 0));
 }
+
+// remove zeroes from the board
+export function removeTheVoid(_board: number[][]) {
+  return _board.map(col => col.filter(r => r > 0));
+}

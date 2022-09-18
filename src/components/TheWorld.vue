@@ -2,9 +2,9 @@
   <p>
     <ThePlayer
       ref="playerOne"
-      :name="'Player-One'"
+      :name="'You'"
       :is-player-turn="isPlayerOneTurn"
-      :local-player="localPlayer"
+      :player-id="localPlayer"
       @played-my-turn="playedMyTurn"
     />
   </p>
@@ -14,17 +14,20 @@
       ref="playerTwo"
       :name="'Player-Two'"
       :is-player-turn="isPlayerTwoTurn"
-      :other-player="otherPlayer"
+      :player-id="otherPlayer"
       @played-my-turn="playedMyTurn"
+      @fetch-me-boss="fetchMeBoss"
     />
   </p>
 </template>
 
 <script lang="ts">
 import ThePlayer from '@/components/ThePlayer.vue';
+import LocalStorageRepository from '@/repositories/LocalStorageRepository';
+import ProfileRepository from '@/repositories/ProfileRepository';
+import { useGameStore } from '@/stores/gameStore';
 import { supabase } from '@/supabase';
 import { defineComponent } from 'vue';
-import LocalStorageRepository from '@/repositories/LocalStorageRepository';
 
 export default defineComponent({
   name: 'TheWorld',
@@ -35,9 +38,23 @@ export default defineComponent({
     return {
       isPlayerOneTurn: true,
       isPlayerTwoTurn: false,
-      localPlayer: '',
+      gameStore: useGameStore(),
       otherPlayer: '',
     };
+  },
+  computed: {
+    localPlayer(): string {
+      const userId = supabase.auth.user()?.id;
+      if (!userId) return '';
+      const localSession = LocalStorageRepository.getLocalUserSession();
+      const localSessionUserId = localSession?.currentSession?.user?.id || '';
+
+      if (userId === localSessionUserId) {
+        return localSessionUserId;
+      }
+
+      return '';
+    },
   },
   methods: {
     playedMyTurn() {
@@ -53,17 +70,24 @@ export default defineComponent({
         return;
       }
     },
+    async fetchOtherPlayer() {
+      // find other users connected to this game.
+      const _game_id = this.gameStore.game?.id;
+      const otherplayer = await ProfileRepository.getOtherPlayer(
+        _game_id,
+        this.gameStore.user?.id
+      ).then(_ => _);
+      this.otherPlayer = otherplayer;
+      return otherplayer;
+    },
+    async fetchMeBoss() {
+      await this.fetchOtherPlayer();
+    },
   },
-  created() {
-    const userId = supabase.auth.user()?.id;
-    if (!userId) return;
-    const localSession = LocalStorageRepository.getLocalUserSession();
-    const localSessionUserId = localSession?.currentSession?.user?.id || '';
-    if (userId === localSessionUserId) {
-      this.localPlayer = localSessionUserId;
-    }
-
-    // find other users connected to this game.
+  watch: {
+    async isPlayerOneTurn() {
+      return 1;
+    },
   },
 });
 </script>

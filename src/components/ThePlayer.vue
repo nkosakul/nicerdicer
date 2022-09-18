@@ -1,5 +1,5 @@
 <template>
-  <h2 style="color: blue">{{ name }}</h2>
+  <h2 style="color: blue">{{ name }} {{ playerId }}</h2>
   <button :disabled="!isPlayerTurn" @click="roll">ROLL!</button>
   <div style="padding: 5px">{{ rolledValue }}</div>
   <div class="dice"></div>
@@ -16,24 +16,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import TheBoard from '@/components/TheBoard.vue';
+import ProfileRepository from '@/repositories/ProfileRepository';
 import {
   countOccurencesInArray,
   randomize,
+  removeTheVoid,
   rotateNestedArray,
   sumColumn,
 } from '@/helpers/common';
-import TheBoard from '@/components/TheBoard.vue';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ThePlayer',
-  emits: ['playedMyTurn'],
+  emits: ['playedMyTurn', 'fetchMeBoss'],
   components: {
     TheBoard,
   },
   props: {
     isPlayerTurn: Boolean,
     name: { type: String, default: 'Player' },
+    playerId: { type: String, default: '' },
   },
   data() {
     return {
@@ -69,6 +72,7 @@ export default defineComponent({
       if (success) {
         this.reset();
         this.calculateSum();
+        this.syncBoard();
         this.$emit('playedMyTurn');
       }
     },
@@ -83,7 +87,7 @@ export default defineComponent({
       return false;
     },
     // calculate sum, by column then reduce to all board
-    calculateSum() {
+    calculateSum(): number {
       return (this.sum = this.board
         .map((column: number[], index: number) => {
           // [number => count]
@@ -111,6 +115,33 @@ export default defineComponent({
     reset() {
       this.rolledValue = 0;
     },
+    async fetchBoard() {
+      if (this.playerId === null || this.playerId === '') return false;
+
+      const _board = await ProfileRepository.fetchBoard(this.playerId);
+      if (_board) {
+        // rotating the original to get the rotated view
+        this.rotatedBoard = rotateNestedArray(_board);
+        // remove the zeros from the orignal
+        this.board = removeTheVoid(_board);
+        this.calculateSum();
+      }
+      return true;
+    },
+    async syncBoard() {
+      // rotating the rotated to get the original
+      const db_board = rotateNestedArray(this.rotatedBoard);
+      await ProfileRepository.updateBoard(this.playerId, db_board);
+    },
+  },
+  watch: {
+    async playerId() {
+      await this.fetchBoard();
+    },
+  },
+  async created() {
+    this.$emit('fetchMeBoss');
+    await this.fetchBoard();
   },
 });
 </script>
