@@ -77,8 +77,19 @@ export default defineComponent({
         this.loading = false;
       }
     },
-    joinGame(_game_id: string) {
-      console.log(_game_id);
+    async joinGame(_game_id: string) {
+      const game = await this.fetchGame(_game_id);
+      // join game, returns boolean
+      const hasJoinedSuccessfully = await GameUserRepository.joinGame(
+        game.id,
+        this.gameStore.user?.id
+      );
+      if (hasJoinedSuccessfully) {
+        // set it in store, local storage
+        this.gameStore.game = game;
+        LocalStorageRepository.setLocalGame();
+      }
+
       return;
     },
     getLocalGame(): Game | null {
@@ -88,7 +99,10 @@ export default defineComponent({
     async deleteGame(_game_id: string) {
       try {
         // todo delete from database
-        const error = await GameRepository.deleteGame(_game_id);
+        const error = await GameRepository.deleteGame(
+          _game_id,
+          this.gameStore.user?.id
+        );
         if (error) throw error;
         this.gameStore.setGame(null);
         LocalStorageRepository.deleteLocalGame();
@@ -98,7 +112,7 @@ export default defineComponent({
         this.refreshCanCreateGame();
       } catch (error) {
         const e = error as Error;
-        alert(e.name + ' ' + e.message);
+        alert(e.message);
       }
     },
     async refreshList() {
@@ -111,10 +125,28 @@ export default defineComponent({
         this.gameStore.user?.id
       );
     },
+    async fetchGame(_game_id: string) {
+      const game = await GameRepository.getGame(_game_id);
+      return game;
+    },
+    async gameInUrl() {
+      const url = window.location.pathname.split('/').filter(x => x);
+      if (url.length == 2) {
+        if (url[0] !== 'game') return;
+        if (url[1] === '') return;
+
+        // fetch the game, join it, remove it from URL
+        this.joinGame(url[1]);
+        window.location.href = window.location.origin;
+      }
+    },
   },
   async created() {
     this.refreshList();
     this.refreshCanCreateGame();
+
+    // if url has game id in it
+    this.gameInUrl();
   },
 });
 </script>

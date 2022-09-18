@@ -1,4 +1,3 @@
-import type { PostgrestError } from '@supabase/postgrest-js';
 import type { GameUser } from '../d';
 import { supabase } from '../supabase';
 
@@ -8,16 +7,20 @@ class GameUserRepository {
     const { data } = await supabase
       .from('games_profiles')
       .select('*')
-      .eq('host_id', _userId);
+      .or(`host_id.eq.${_userId},joiner_id.eq.${_userId}`);
     return data as GameUser[];
   }
 
-  async deleteRelation(_gameId: string): Promise<PostgrestError | null> {
-    const { error } = await supabase
+  async deleteRelation(
+    _gameId: string,
+    _deleter_id: string | undefined
+  ): Promise<boolean | null> {
+    if (_deleter_id == typeof undefined) return null;
+    const { data } = await supabase
       .from('games_profiles')
       .delete()
-      .eq('game_id', _gameId);
-    return error;
+      .match({ game_id: _gameId, host_id: _deleter_id });
+    return data?.length ? true : false;
   }
 
   async canUserInsertGame(_userId: string | undefined): Promise<boolean> {
@@ -36,6 +39,36 @@ class GameUserRepository {
       .from('games_profiles')
       .insert([{ game_id: _gameId, host_id: _hostId }]);
     return { error };
+  }
+
+  async joinGame(
+    _game_id: string,
+    _joiner_id: string | undefined
+  ): Promise<boolean> {
+    if (_joiner_id == typeof undefined) return false;
+    const { data } = await supabase
+      .from('games_profiles')
+      .select('*')
+      .eq('game_id', _game_id)
+      .limit(1);
+
+    if (!data || data.length < 1) return false;
+
+    const joiner_id = data[0].joiner_id;
+    if (joiner_id === _joiner_id) return true;
+
+    if (joiner_id === null) {
+      const { error } = await supabase
+        .from('games_profiles')
+        .update({ joiner_id: _joiner_id })
+        .eq('game_id', _game_id);
+
+      if (!error) return true;
+    }
+
+    if (data[0].host_id === _joiner_id) return true;
+
+    return false;
   }
 }
 
