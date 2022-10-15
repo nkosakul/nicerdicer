@@ -3,7 +3,14 @@ import GameUserRepository from './GameUserRepository';
 
 class ProfileRepository {
   async getProfile(_userId: string) {
-    return await supabase.from('profiles').select('*').eq('id', _userId);
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', _userId);
+
+    if (!data || data.length < 1) return false;
+
+    return data[0];
   }
 
   async getOtherPlayer(

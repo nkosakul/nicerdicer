@@ -1,14 +1,38 @@
 import type { GameUser } from '../d';
 import { supabase } from '../supabase';
+import ProfileRepository from './ProfileRepository';
 
 class GameUserRepository {
   async listGames(_userId: string | undefined): Promise<GameUser[]> {
-    // todo find joiner_id name
     const { data } = await supabase
       .from('games_profiles')
       .select('*')
       .or(`host_id.eq.${_userId},joiner_id.eq.${_userId}`);
-    return data as GameUser[];
+
+    const list = data?.map(async function (_data) {
+      if (_userId == _data['joiner_id'] && _data['host_id']) {
+        const hoster = await ProfileRepository.getProfile(_data['host_id']);
+
+        if (!hoster) return _data;
+        _data['other_player_name'] = hoster['name'];
+
+        return _data;
+      }
+
+      if (_userId == _data['host_id'] && _data['joiner_id']) {
+        const joiner = await ProfileRepository.getProfile(_data['joiner_id']);
+        if (!joiner) return _data;
+        _data['other_player_name'] = joiner['name'];
+
+        return _data;
+      }
+
+      return _data;
+    });
+
+    const awaited_list = await Promise.all(list).then(_r => _r);
+
+    return awaited_list as GameUser[];
   }
 
   async deleteRelation(

@@ -10,6 +10,7 @@ export interface GameUser {
   host_id: string;
   game_id: string;
   joiner_id: string;
+  other_player_name: string;
 }
 
 export interface LocalStorageSession {
