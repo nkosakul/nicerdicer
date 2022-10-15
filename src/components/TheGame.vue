@@ -20,7 +20,7 @@
   <div v-for="(game, index) in listOfGames" :key="index">
     {{ game.game_id }}, {{ game.other_player_name }}
     <button @click="deleteGame(game.game_id)">Delete Game</button>
-    <button @onclick="joinGame(game.game_id)">Join Game</button>
+    <button @click="joinGame(game.game_id)">Join Game</button>
   </div>
 </template>
 
