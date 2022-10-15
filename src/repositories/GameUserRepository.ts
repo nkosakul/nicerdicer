@@ -80,6 +80,8 @@ class GameUserRepository {
 
     const joiner_id = data[0].joiner_id;
     if (joiner_id === _joiner_id) return true;
+    const host_id = data[0].host_id;
+    if (host_id === _joiner_id) return true;
 
     if (joiner_id === null) {
       const { error } = await supabase
