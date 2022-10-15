@@ -1,8 +1,9 @@
 import type { GameUser } from '../d';
 import { supabase } from '../supabase';
+import GameProfileBoardRepository from './GameProfileBoardRepository';
 import ProfileRepository from './ProfileRepository';
 
-class GameUserRepository {
+class GameProfileRepository {
   async listGames(_userId: string | undefined): Promise<GameUser[]> {
     const { data } = await supabase
       .from('games_profiles')
@@ -40,6 +41,10 @@ class GameUserRepository {
     _deleter_id: string | undefined
   ): Promise<boolean | null> {
     if (_deleter_id == typeof undefined) return null;
+    const board_delete = await GameProfileBoardRepository.delete(_gameId);
+
+    if (!board_delete) return false;
+
     const { data } = await supabase
       .from('games_profiles')
       .delete()
@@ -62,6 +67,9 @@ class GameUserRepository {
     const { error } = await supabase
       .from('games_profiles')
       .insert([{ game_id: _gameId, host_id: _hostId }]);
+
+    await GameProfileBoardRepository.initBoard(_hostId, _gameId);
+
     return { error };
   }
 
@@ -89,6 +97,8 @@ class GameUserRepository {
         .update({ joiner_id: _joiner_id })
         .eq('game_id', _game_id);
 
+      await GameProfileBoardRepository.initBoard(_joiner_id, _game_id);
+
       if (!error) return true;
     }
 
@@ -108,7 +118,8 @@ class GameUserRepository {
       .from('games_profiles')
       .select('joiner_id,host_id')
       .eq('game_id', _game_id);
-    if (!data || data.length < 1) return null;
+
+    if (!data || data.length < 1) return false;
 
     const host = data[0].host_id;
     const joiner = data[0].joiner_id;
@@ -116,8 +127,8 @@ class GameUserRepository {
     if (joiner === _user_id) return host;
     if (host === _user_id) return joiner;
 
-    return null;
+    return false;
   }
 }
 
-export default new GameUserRepository();
+export default new GameProfileRepository();

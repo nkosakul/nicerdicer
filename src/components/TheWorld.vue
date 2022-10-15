@@ -2,9 +2,8 @@
   <p>
     <ThePlayer
       ref="playerOne"
-      :name="'You'"
       :is-player-turn="isPlayerOneTurn"
-      :player-id="localPlayer"
+      :player="localPlayer"
       @played-my-turn="playedMyTurn"
     />
   </p>
@@ -12,9 +11,8 @@
   <p>
     <ThePlayer
       ref="playerTwo"
-      :name="'Player-Two'"
       :is-player-turn="isPlayerTwoTurn"
-      :player-id="otherPlayer"
+      :player="otherPlayer"
       @played-my-turn="playedMyTurn"
       @fetch-me-boss="fetchMeBoss"
     />
@@ -28,6 +26,7 @@ import ProfileRepository from '@/repositories/ProfileRepository';
 import { useGameStore } from '@/stores/gameStore';
 import { supabase } from '@/supabase';
 import { defineComponent } from 'vue';
+import type { User } from '@supabase/supabase-js';
 
 export default defineComponent({
   name: 'TheWorld',
@@ -39,21 +38,22 @@ export default defineComponent({
       isPlayerOneTurn: true,
       isPlayerTwoTurn: false,
       gameStore: useGameStore(),
-      otherPlayer: '',
+      otherPlayer: null,
     };
   },
   computed: {
-    localPlayer(): string {
-      const userId = supabase.auth.user()?.id;
-      if (!userId) return '';
+    localPlayer(): User | null {
+      const user = supabase.auth.user();
+      if (!user) return null;
       const localSession = LocalStorageRepository.getLocalUserSession();
-      const localSessionUserId = localSession?.currentSession?.user?.id || '';
+      const localSessionUser = localSession?.currentSession?.user || null;
 
-      if (userId === localSessionUserId) {
-        return localSessionUserId;
+      if (user.id === localSessionUser?.id) {
+        // todo get profile
+        return user;
       }
 
-      return '';
+      return null;
     },
   },
   methods: {
@@ -77,6 +77,9 @@ export default defineComponent({
         _game_id,
         this.gameStore.user?.id
       ).then(_ => _);
+
+      if (!otherplayer) return;
+
       this.otherPlayer = otherplayer;
       return otherplayer;
     },

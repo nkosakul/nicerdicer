@@ -29,7 +29,7 @@ import type { Game, GameUser } from '@/d';
 import { useGameStore } from '@/stores/gameStore';
 import { defineComponent } from 'vue';
 import GameRepository from '../repositories/GameRepository';
-import GameUserRepository from '../repositories/GameUserRepository';
+import GameProfileRepository from '../repositories/GameProfileRepository';
 import LocalStorageRepository from '../repositories/LocalStorageRepository';
 
 export default defineComponent({
@@ -61,7 +61,7 @@ export default defineComponent({
           const gameId = this.gameStore.game?.id;
           const userId = this.gameStore.user?.id;
           if (gameId && userId) {
-            const { error } = await GameUserRepository.insertGameUser(
+            const { error } = await GameProfileRepository.insertGameUser(
               gameId,
               userId
             );
@@ -80,7 +80,7 @@ export default defineComponent({
     async joinGame(_game_id: string) {
       const game = await this.fetchGame(_game_id);
       // join game, returns boolean
-      const hasJoinedSuccessfully = await GameUserRepository.joinGame(
+      const hasJoinedSuccessfully = await GameProfileRepository.joinGame(
         game.id,
         this.gameStore.user?.id
       );
@@ -116,12 +116,12 @@ export default defineComponent({
       }
     },
     async refreshList() {
-      this.listOfGames = await GameUserRepository.listGames(
+      this.listOfGames = await GameProfileRepository.listGames(
         this.gameStore.user?.id
       );
     },
     async refreshCanCreateGame() {
-      this.canCreateGame = await GameUserRepository.canUserInsertGame(
+      this.canCreateGame = await GameProfileRepository.canUserInsertGame(
         this.gameStore.user?.id
       );
     },

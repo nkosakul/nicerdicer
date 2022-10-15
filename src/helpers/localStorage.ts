@@ -25,6 +25,5 @@ export const addGameToLocalStorage = (payload: GameInfoType) => {
 export const removeGameFromLocalStorage = (gameId: string) => {
   const games = getGamesFromLocalStorage();
   const filteredGames = games.filter(game => game.gameId !== gameId);
-  console.log('filteredGames', filteredGames);
   localStorage.setItem(storageName, JSON.stringify(filteredGames));
 };

@@ -1,6 +1,6 @@
 import { supabase } from '@/supabase';
 import type { PostgrestError } from '@supabase/supabase-js';
-import GameUserRepository from './GameUserRepository';
+import GameProfileRepository from './GameProfileRepository';
 
 class GameRepository {
   async insertGame() {
@@ -14,7 +14,7 @@ class GameRepository {
     _deleter_id: string | undefined
   ): Promise<PostgrestError | null> {
     if (_deleter_id == typeof undefined) return null;
-    const isDeleted = await GameUserRepository.deleteRelation(
+    const isDeleted = await GameProfileRepository.deleteRelation(
       _gameId,
       _deleter_id
     );

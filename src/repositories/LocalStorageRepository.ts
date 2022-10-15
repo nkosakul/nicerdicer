@@ -3,7 +3,6 @@ import { useGameStore } from '@/stores/gameStore';
 
 class LocalStorageRepository {
   getLocalGame(): Game | null {
-    console.log('localgame');
     const game = localStorage.getItem('supabase_games');
     return game ? JSON.parse(game) : null;
   }

@@ -1,5 +1,5 @@
 <template>
-  <h2 style="color: blue">{{ name }} {{ playerId }}</h2>
+  <h2 style="color: blue">{{ player?.name }}</h2>
   <button :disabled="!isPlayerTurn" @click="roll">ROLL!</button>
   <div style="padding: 5px">{{ rolledValue }}</div>
   <div class="dice"></div>
@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import TheBoard from '@/components/TheBoard.vue';
-import ProfileRepository from '@/repositories/ProfileRepository';
+import GameProfileBoardRepository from '@/repositories/GameProfileBoardRepository';
 import {
   countOccurencesInArray,
   randomize,
@@ -26,6 +26,7 @@ import {
   sumColumn,
 } from '@/helpers/common';
 import { defineComponent } from 'vue';
+import { useGameStore } from '@/stores/gameStore';
 
 export default defineComponent({
   name: 'ThePlayer',
@@ -35,8 +36,8 @@ export default defineComponent({
   },
   props: {
     isPlayerTurn: Boolean,
-    name: { type: String, default: 'Player' },
-    playerId: { type: String, default: '' },
+    // eslint-disable-next-line vue/require-default-prop
+    player: null,
   },
   data() {
     return {
@@ -52,6 +53,7 @@ export default defineComponent({
       columnOneSum: 0 as number,
       columnTwoSum: 0 as number,
       columnThreeSum: 0 as number,
+      gameStore: useGameStore(),
     };
   },
   methods: {
@@ -116,9 +118,13 @@ export default defineComponent({
       this.rolledValue = 0;
     },
     async fetchBoard() {
-      if (this.playerId === null || this.playerId === '') return false;
+      if (this.player === null) return false;
+      if (this.gameStore.game === null) return false;
 
-      const _board = await ProfileRepository.fetchBoard(this.playerId);
+      const _board = await GameProfileBoardRepository.fetchBoard(
+        this.player.id,
+        this.gameStore.game?.id
+      );
       if (_board) {
         // rotating the original to get the rotated view
         this.rotatedBoard = rotateNestedArray(_board);
@@ -129,13 +135,18 @@ export default defineComponent({
       return true;
     },
     async syncBoard() {
+      if (this.gameStore.game === null) return false;
       // rotating the rotated to get the original
       const db_board = rotateNestedArray(this.rotatedBoard);
-      await ProfileRepository.updateBoard(this.playerId, db_board);
+      await GameProfileBoardRepository.updateBoard(
+        this.player?.id,
+        this.gameStore.game?.id,
+        db_board
+      );
     },
   },
   watch: {
-    async playerId() {
+    async player() {
       await this.fetchBoard();
     },
   },
