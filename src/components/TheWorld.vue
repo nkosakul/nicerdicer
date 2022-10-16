@@ -2,7 +2,8 @@
   <p>
     <ThePlayer
       ref="playerOne"
-      :is-player-turn="localPlayerTurn && otherPlayer !== null"
+      :is-player-turn="localPlayerTurn"
+      :other-player="otherPlayer"
       :player="localPlayer"
       @played-my-turn="playedMyTurn"
     />

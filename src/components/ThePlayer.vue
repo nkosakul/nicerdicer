@@ -44,6 +44,10 @@ export default defineComponent({
       type: Object as () => User & Profile,
       default: {} as User & Profile,
     },
+    otherPlayer: {
+      type: Object as () => (User & Profile) | null,
+      default: null,
+    },
   },
   data() {
     return {
@@ -65,7 +69,7 @@ export default defineComponent({
   methods: {
     // roll the dice and set rolledValue
     roll(): number {
-      if (this.isPlayerTurn && this.rolledValue === 0) {
+      if (this.isPlayerTurn && this.rolledValue === 0 && this.otherPlayer) {
         this.rolledValue = randomize();
 
         return this.rolledValue;

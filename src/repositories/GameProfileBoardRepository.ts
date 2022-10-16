@@ -5,16 +5,14 @@ class GameProfileBoardRepo {
     _game_id: string,
     _is_turn: boolean
   ) {
-    return await supabase
-      .from('games_profiles_boards')
-      .insert([
-        {
-          game_id: _game_id,
-          player_id: _player_id,
-          board: null,
-          is_turn: _is_turn,
-        },
-      ]);
+    return await supabase.from('games_profiles_boards').insert([
+      {
+        game_id: _game_id,
+        player_id: _player_id,
+        board: null,
+        is_turn: _is_turn,
+      },
+    ]);
   }
 
   async fetchBoard(_player_id: string, _game_id: string) {
@@ -62,8 +60,6 @@ class GameProfileBoardRepo {
       .eq('player_id', _player_id);
 
     if (!data || data.length < 1) return false;
-
-    console.log(data);
 
     return data[0]['is_turn'];
   }
