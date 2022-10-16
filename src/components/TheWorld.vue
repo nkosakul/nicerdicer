@@ -40,7 +40,7 @@ export default defineComponent({
   data() {
     return {
       gameStore: useGameStore(),
-      otherPlayer: null,
+      otherPlayer: null as (User & Profile) | null,
       localPlayerTurn: true,
       otherPlayerTurn: false,
     };
@@ -52,7 +52,7 @@ export default defineComponent({
       if (!localSession) throw new Error();
       const localSessionUser = localSession?.user;
 
-      return localSessionUser;
+      return this.gameStore.user || localSessionUser;
     },
   },
   methods: {
