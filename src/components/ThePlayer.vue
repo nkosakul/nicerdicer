@@ -165,10 +165,10 @@ export default defineComponent({
       );
     },
     subscribeBoard() {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       GameProfileBoardRepository.subscribeBoard(
         this.player.id,
         this,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         function callbackFunciton(thus: any, board: BoardSubsctiption) {
           if (board.player_id === thus.player?.id) {
             thus.setBoard(board.board);
