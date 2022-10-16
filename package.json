@@ -24,7 +24,7 @@
     ]
   },
   "dependencies": {
-    "@supabase/supabase-js": "1.35.6",
+    "@supabase/supabase-js": "2.0.0",
     "pinia": "^2.0.21",
     "vue": "^3.2.37"
   },

@@ -5,13 +5,14 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_BASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  autoRefreshToken: true,
-  persistSession: true,
-  localStorage,
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    storage: localStorage,
+  },
 });
 
 supabase.auth.onAuthStateChange((_, session) => {
-  const user = session?.user || supabase.auth.user();
   const gameStore = useGameStore();
-  gameStore.setUser(user);
+  gameStore.setUser(session?.user || null);
 });

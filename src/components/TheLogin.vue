@@ -56,7 +56,6 @@
 
 <script lang="ts">
 import { useGameStore } from '@/stores/gameStore';
-import type { Session } from '@supabase/gotrue-js';
 import { ref } from 'vue';
 import { supabase } from '@/supabase';
 
@@ -74,7 +73,10 @@ export default {
       try {
         loading.value = true;
 
-        const { user: user, error: er } = await supabase.auth.signIn({
+        const {
+          data: { user: user },
+          error: er,
+        } = await supabase.auth.signInWithPassword({
           email: loginName.value + '@xx.xxx',
           password: loginPassword.value,
         });
@@ -95,19 +97,20 @@ export default {
     const handleSignUp = async () => {
       try {
         // todo implement honey pot
-        const { data: data, error: error } =
-          await supabase.auth.api.signUpWithEmail(
-            name.value + '@xx.xxx',
-            password.value
-          );
+        const { data: data, error: error } = await supabase.auth.signUp({
+          email: name.value + '@xx.xxx',
+          password: password.value,
+        });
         if (error) throw error;
 
         if (data && 'refresh_token' in data) {
-          const session = data as Session;
-          const signedIn = await supabase.auth.signIn({
-            refreshToken: session.refresh_token,
+          const {
+            data: { user: user },
+          } = await supabase.auth.signInWithPassword({
+            email: loginName.value + '@xx.xxx',
+            password: loginPassword.value,
           });
-          gameStore.setUser(signedIn.user);
+          gameStore.setUser(user);
           return;
         }
 

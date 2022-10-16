@@ -24,7 +24,6 @@ import ThePlayer from '@/components/ThePlayer.vue';
 import LocalStorageRepository from '@/repositories/LocalStorageRepository';
 import ProfileRepository from '@/repositories/ProfileRepository';
 import { useGameStore } from '@/stores/gameStore';
-import { supabase } from '@/supabase';
 import { defineComponent } from 'vue';
 import type { User } from '@supabase/supabase-js';
 
@@ -43,17 +42,10 @@ export default defineComponent({
   },
   computed: {
     localPlayer(): User | null {
-      const user = supabase.auth.user();
-      if (!user) return null;
       const localSession = LocalStorageRepository.getLocalUserSession();
       const localSessionUser = localSession?.currentSession?.user || null;
 
-      if (user.id === localSessionUser?.id) {
-        // todo get profile
-        return user;
-      }
-
-      return null;
+      return localSessionUser;
     },
   },
   methods: {

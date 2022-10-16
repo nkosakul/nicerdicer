@@ -1,6 +1,6 @@
 import { supabase } from './../supabase';
 class GameProfileBoardRepo {
-  async initBoard(_player_id: string, _game_id: string) {
+  async initBoard(_player_id: string | undefined, _game_id: string) {
     return await supabase
       .from('games_profiles_boards')
       .insert([{ game_id: _game_id, player_id: _player_id, board: null }]);
@@ -23,10 +23,9 @@ class GameProfileBoardRepo {
     _game_id: string,
     _board: Array<Array<number>>
   ) {
-    if (supabase.auth.user()?.id !== _player_id) return false;
     const { data } = await supabase
       .from('games_profiles_boards')
-      .update({ board: _board }, { returning: 'minimal' })
+      .update({ board: _board })
       .eq('game_id', _game_id)
       .eq('player_id', _player_id);
 

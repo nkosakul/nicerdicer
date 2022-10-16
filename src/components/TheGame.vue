@@ -52,11 +52,10 @@ export default defineComponent({
         this.loading = true;
 
         // insert game
-        const { data, error } = await GameRepository.insertGame();
-        if (error) throw error;
+        const game = await GameRepository.insertGame();
 
-        if (data) {
-          this.gameStore.setGame(data[0]);
+        if (game) {
+          this.gameStore.setGame(game);
           // insert game - user relation
           const gameId = this.gameStore.game?.id;
           const userId = this.gameStore.user?.id;

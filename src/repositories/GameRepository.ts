@@ -4,9 +4,15 @@ import GameProfileRepository from './GameProfileRepository';
 
 class GameRepository {
   async insertGame() {
-    const { data, error } = await supabase.from('games').insert([{}]);
+    const { data, error } = await supabase
+      .from('games')
+      .insert([{}])
+      .select('*');
 
-    return { data, error };
+    if (error) throw error;
+    if (!data || data.length < 1) return false;
+
+    return data[0];
   }
 
   async deleteGame(
