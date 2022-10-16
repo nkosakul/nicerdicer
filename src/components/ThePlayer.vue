@@ -170,7 +170,7 @@ export default defineComponent({
         this,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         function callbackFunciton(thus: any, board: BoardSubsctiption) {
-          if (board.player_id === thus.player?.id) {
+          if (board.player_id === thus.player?.id && board.board) {
             thus.setBoard(board.board);
             thus.$emit('playedMyTurn', {
               player: board.player_id,
