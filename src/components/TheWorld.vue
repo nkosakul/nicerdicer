@@ -10,11 +10,11 @@
   <hr />
   <p>
     <ThePlayer
+      v-if="otherPlayer"
       ref="playerTwo"
       :is-player-turn="isPlayerTwoTurn"
       :player="otherPlayer"
       @played-my-turn="playedMyTurn"
-      @fetch-me-boss="fetchMeBoss"
     />
   </p>
 </template>
@@ -26,6 +26,7 @@ import ProfileRepository from '@/repositories/ProfileRepository';
 import { useGameStore } from '@/stores/gameStore';
 import { defineComponent } from 'vue';
 import type { User } from '@supabase/supabase-js';
+import type { Profile } from '@/d';
 
 export default defineComponent({
   name: 'TheWorld',
@@ -41,9 +42,11 @@ export default defineComponent({
     };
   },
   computed: {
-    localPlayer(): User | null {
+    localPlayer(): User & Profile {
       const localSession = LocalStorageRepository.getLocalUserSession();
-      const localSessionUser = localSession?.user || null;
+
+      if (!localSession) throw new Error();
+      const localSessionUser = localSession?.user;
 
       return localSessionUser;
     },
@@ -75,14 +78,14 @@ export default defineComponent({
       this.otherPlayer = otherplayer;
       return otherplayer;
     },
-    async fetchMeBoss() {
-      await this.fetchOtherPlayer();
-    },
   },
   watch: {
     async isPlayerOneTurn() {
       return 1;
     },
+  },
+  async created() {
+    await this.fetchOtherPlayer();
   },
 });
 </script>

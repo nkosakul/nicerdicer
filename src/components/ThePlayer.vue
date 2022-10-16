@@ -1,5 +1,5 @@
 <template>
-  <h2 style="color: blue">{{ player?.name }}</h2>
+  <h2 style="color: blue">{{ player.name }}</h2>
   <button :disabled="!isPlayerTurn" @click="roll">ROLL!</button>
   <div style="padding: 5px">{{ rolledValue }}</div>
   <div class="dice"></div>
@@ -27,17 +27,23 @@ import {
 } from '@/helpers/common';
 import { defineComponent } from 'vue';
 import { useGameStore } from '@/stores/gameStore';
+import { supabase } from './../supabase';
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import type { BoardSubsctiption, Profile } from '@/d';
+import type { User } from '@supabase/supabase-js';
 
 export default defineComponent({
   name: 'ThePlayer',
-  emits: ['playedMyTurn', 'fetchMeBoss'],
+  emits: ['playedMyTurn'],
   components: {
     TheBoard,
   },
   props: {
     isPlayerTurn: Boolean,
-    // eslint-disable-next-line vue/require-default-prop
-    player: null,
+    player: {
+      type: Object as () => User & Profile,
+      default: {} as User & Profile,
+    },
   },
   data() {
     return {
@@ -117,6 +123,14 @@ export default defineComponent({
     reset() {
       this.rolledValue = 0;
     },
+    // set board
+    setBoard(_board: number[][]) {
+      // rotating the original to get the rotated view
+      this.rotatedBoard = rotateNestedArray(_board);
+      // remove the zeros from the orignal
+      this.board = removeTheVoid(_board);
+      this.calculateSum();
+    },
     async fetchBoard() {
       if (this.player === null) return false;
       if (this.gameStore.game === null) return false;
@@ -126,11 +140,7 @@ export default defineComponent({
         this.gameStore.game?.id
       );
       if (_board) {
-        // rotating the original to get the rotated view
-        this.rotatedBoard = rotateNestedArray(_board);
-        // remove the zeros from the orignal
-        this.board = removeTheVoid(_board);
-        this.calculateSum();
+        this.setBoard(_board);
       }
       return true;
     },
@@ -144,6 +154,31 @@ export default defineComponent({
         db_board
       );
     },
+    subscribeBoard() {
+      supabase
+        .channel('public:games_profiles_boards')
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'games_profiles_boards',
+          },
+          (
+            payload: RealtimePostgresChangesPayload<{
+              [key: string]: unknown;
+            }>
+          ) => {
+            if (payload.new) {
+              const subscription_board = payload.new as BoardSubsctiption;
+              if (subscription_board.player_id === this.player?.id) {
+                this.setBoard(subscription_board.board);
+              }
+            }
+          }
+        )
+        .subscribe();
+    },
   },
   watch: {
     async player() {
@@ -151,8 +186,10 @@ export default defineComponent({
     },
   },
   async created() {
-    this.$emit('fetchMeBoss');
     await this.fetchBoard();
+  },
+  mounted() {
+    this.subscribeBoard();
   },
 });
 </script>

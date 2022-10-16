@@ -5,6 +5,10 @@ export interface Game {
   url: string;
 }
 
+export interface Profile {
+  name: string;
+}
+
 export interface GameUser {
   id: string;
   host_id: string;
@@ -14,5 +18,10 @@ export interface GameUser {
 }
 
 export interface LocalStorageSession {
-  user: User;
+  user: User & Profile;
+}
+
+export interface BoardSubsctiption {
+  board: number[][];
+  player_id: string;
 }

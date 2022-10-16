@@ -19,9 +19,9 @@ class LocalStorageRepository {
     localStorage.removeItem('supabase_games');
   }
 
-  getLocalUserSession(): LocalStorageSession | null {
+  getLocalUserSession(): LocalStorageSession {
     const session = localStorage.getItem(defaultLocalKey);
-    return session ? JSON.parse(session) : null;
+    return session ? JSON.parse(session) : false;
   }
 }
 
