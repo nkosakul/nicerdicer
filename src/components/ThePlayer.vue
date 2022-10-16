@@ -27,8 +27,6 @@ import {
 } from '@/helpers/common';
 import { defineComponent } from 'vue';
 import { useGameStore } from '@/stores/gameStore';
-import { supabase } from './../supabase';
-import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import type { BoardSubsctiption, Profile } from '@/d';
 import type { User } from '@supabase/supabase-js';
 
@@ -167,33 +165,20 @@ export default defineComponent({
       );
     },
     subscribeBoard() {
-      supabase
-        .channel('public:games_profiles_boards')
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'games_profiles_boards',
-          },
-          (
-            payload: RealtimePostgresChangesPayload<{
-              [key: string]: unknown;
-            }>
-          ) => {
-            if (payload.new) {
-              const subscription_board = payload.new as BoardSubsctiption;
-              if (subscription_board.player_id === this.player?.id) {
-                this.setBoard(subscription_board.board);
-                this.$emit('playedMyTurn', {
-                  player: subscription_board.player_id,
-                  is_turn: subscription_board.is_turn,
-                });
-              }
-            }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      GameProfileBoardRepository.subscribeBoard(
+        this.player.id,
+        this,
+        function callbackFunciton(thus: any, board: BoardSubsctiption) {
+          if (board.player_id === thus.player?.id) {
+            thus.setBoard(board.board);
+            thus.$emit('playedMyTurn', {
+              player: board.player_id,
+              is_turn: board.is_turn,
+            });
           }
-        )
-        .subscribe();
+        }
+      );
     },
   },
   watch: {

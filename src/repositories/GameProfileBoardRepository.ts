@@ -1,4 +1,6 @@
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { supabase } from './../supabase';
+
 class GameProfileBoardRepo {
   async initBoard(
     _player_id: string | undefined,
@@ -84,6 +86,30 @@ class GameProfileBoardRepo {
     if (error || er) return false;
 
     return true;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  subscribeBoard(_player_id: string, thus: any, callback: any) {
+    supabase
+      .channel('public:games_profiles_boards')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'games_profiles_boards',
+        },
+        (
+          payload: RealtimePostgresChangesPayload<{
+            [key: string]: unknown;
+          }>
+        ) => {
+          if (payload.new) {
+            callback(thus, payload.new);
+          }
+        }
+      )
+      .subscribe();
   }
 }
 
