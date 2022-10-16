@@ -31,7 +31,7 @@ class GameProfileRepository {
       return _data;
     });
 
-    const awaited_list = await Promise.all(list).then(_r => _r);
+    const awaited_list = await Promise.all(list || []).then(_r => _r);
 
     return awaited_list as GameUser[];
   }
@@ -45,11 +45,12 @@ class GameProfileRepository {
 
     if (!board_delete) return false;
 
-    const { data } = await supabase
+    const { error } = await supabase
       .from('games_profiles')
       .delete()
       .match({ game_id: _gameId, host_id: _deleter_id });
-    return data?.length ? true : false;
+
+    return error ? false : true;
   }
 
   async canUserInsertGame(_userId: string | undefined): Promise<boolean> {

@@ -35,12 +35,12 @@ class GameProfileBoardRepo {
   }
 
   async delete(_game_id: string) {
-    const { data } = await supabase
+    const { error } = await supabase
       .from('games_profiles_boards')
       .delete()
       .match({ game_id: _game_id });
 
-    return data?.length ? true : false;
+    return error ? false : true;
   }
 }
 
