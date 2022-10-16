@@ -24,4 +24,5 @@ export interface LocalStorageSession {
 export interface BoardSubsctiption {
   board: number[][];
   player_id: string;
+  is_turn: boolean;
 }

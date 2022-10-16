@@ -2,7 +2,7 @@
   <p>
     <ThePlayer
       ref="playerOne"
-      :is-player-turn="isPlayerOneTurn"
+      :is-player-turn="localPlayerTurn && otherPlayer !== null"
       :player="localPlayer"
       @played-my-turn="playedMyTurn"
     />
@@ -12,7 +12,7 @@
     <ThePlayer
       v-if="otherPlayer"
       ref="playerTwo"
-      :is-player-turn="isPlayerTwoTurn"
+      :is-player-turn="otherPlayerTurn"
       :player="otherPlayer"
       @played-my-turn="playedMyTurn"
     />
@@ -27,6 +27,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { defineComponent } from 'vue';
 import type { User } from '@supabase/supabase-js';
 import type { Profile } from '@/d';
+import GameProfileBoardRepository from '@/repositories/GameProfileBoardRepository';
 
 export default defineComponent({
   name: 'TheWorld',
@@ -35,10 +36,10 @@ export default defineComponent({
   },
   data() {
     return {
-      isPlayerOneTurn: true,
-      isPlayerTwoTurn: false,
       gameStore: useGameStore(),
       otherPlayer: null,
+      localPlayerTurn: true,
+      otherPlayerTurn: false,
     };
   },
   computed: {
@@ -52,17 +53,16 @@ export default defineComponent({
     },
   },
   methods: {
-    playedMyTurn() {
-      if (this.isPlayerOneTurn) {
-        this.isPlayerOneTurn = false;
-        this.isPlayerTwoTurn = true;
-        return;
-      }
+    async playedMyTurn(data: { player: string; is_turn: boolean }) {
+      const playerId = data.player;
+      const isTurn = data.is_turn;
 
-      if (this.isPlayerTwoTurn) {
-        this.isPlayerOneTurn = true;
-        this.isPlayerTwoTurn = false;
-        return;
+      if (this.localPlayer.id === playerId) {
+        this.localPlayerTurn = isTurn;
+        this.otherPlayerTurn = !isTurn;
+      } else {
+        this.localPlayerTurn = !isTurn;
+        this.otherPlayerTurn = isTurn;
       }
     },
     async fetchOtherPlayer() {
@@ -78,14 +78,18 @@ export default defineComponent({
       this.otherPlayer = otherplayer;
       return otherplayer;
     },
-  },
-  watch: {
-    async isPlayerOneTurn() {
-      return 1;
+    async fetchPlayersTurns() {
+      this.localPlayerTurn = await GameProfileBoardRepository.fetchTurn(
+        this.localPlayer.id,
+        this.gameStore.game?.id
+      );
+
+      this.otherPlayerTurn = !this.localPlayerTurn;
     },
   },
   async created() {
     await this.fetchOtherPlayer();
+    await this.fetchPlayersTurns();
   },
 });
 </script>

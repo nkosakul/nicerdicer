@@ -69,7 +69,7 @@ class GameProfileRepository {
       .from('games_profiles')
       .insert([{ game_id: _gameId, host_id: _hostId }]);
 
-    await GameProfileBoardRepository.initBoard(_hostId, _gameId);
+    await GameProfileBoardRepository.initBoard(_hostId, _gameId, true);
 
     return { error };
   }
@@ -98,7 +98,7 @@ class GameProfileRepository {
         .update({ joiner_id: _joiner_id })
         .eq('game_id', _game_id);
 
-      await GameProfileBoardRepository.initBoard(_joiner_id, _game_id);
+      await GameProfileBoardRepository.initBoard(_joiner_id, _game_id, false);
 
       if (!error) return true;
     }

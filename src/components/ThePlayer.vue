@@ -81,7 +81,7 @@ export default defineComponent({
         this.reset();
         this.calculateSum();
         this.syncBoard();
-        this.$emit('playedMyTurn');
+        this.syncTurn();
       }
     },
     // push dice in column array
@@ -154,6 +154,14 @@ export default defineComponent({
         db_board
       );
     },
+    async syncTurn() {
+      if (this.gameStore.game === null) return false;
+      await GameProfileBoardRepository.updateTurn(
+        this.player?.id,
+        this.gameStore.game?.id,
+        !this.isPlayerTurn
+      );
+    },
     subscribeBoard() {
       supabase
         .channel('public:games_profiles_boards')
@@ -173,6 +181,10 @@ export default defineComponent({
               const subscription_board = payload.new as BoardSubsctiption;
               if (subscription_board.player_id === this.player?.id) {
                 this.setBoard(subscription_board.board);
+                this.$emit('playedMyTurn', {
+                  player: subscription_board.player_id,
+                  is_turn: subscription_board.is_turn,
+                });
               }
             }
           }

@@ -1,9 +1,20 @@
 import { supabase } from './../supabase';
 class GameProfileBoardRepo {
-  async initBoard(_player_id: string | undefined, _game_id: string) {
+  async initBoard(
+    _player_id: string | undefined,
+    _game_id: string,
+    _is_turn: boolean
+  ) {
     return await supabase
       .from('games_profiles_boards')
-      .insert([{ game_id: _game_id, player_id: _player_id, board: null }]);
+      .insert([
+        {
+          game_id: _game_id,
+          player_id: _player_id,
+          board: null,
+          is_turn: _is_turn,
+        },
+      ]);
   }
 
   async fetchBoard(_player_id: string, _game_id: string) {
@@ -23,13 +34,13 @@ class GameProfileBoardRepo {
     _game_id: string,
     _board: Array<Array<number>>
   ) {
-    const { data } = await supabase
+    const { error } = await supabase
       .from('games_profiles_boards')
       .update({ board: _board })
       .eq('game_id', _game_id)
       .eq('player_id', _player_id);
 
-    if (!data || data.length < 1) return false;
+    if (error) return false;
 
     return true;
   }
@@ -41,6 +52,42 @@ class GameProfileBoardRepo {
       .match({ game_id: _game_id });
 
     return error ? false : true;
+  }
+
+  async fetchTurn(_player_id: string, _game_id: string | undefined) {
+    const { data } = await supabase
+      .from('games_profiles_boards')
+      .select('is_turn')
+      .eq('game_id', _game_id)
+      .eq('player_id', _player_id);
+
+    if (!data || data.length < 1) return false;
+
+    console.log(data);
+
+    return data[0]['is_turn'];
+  }
+
+  async updateTurn(
+    _player_id: string,
+    _game_id: string | undefined,
+    _is_turn: boolean
+  ) {
+    const { error } = await supabase
+      .from('games_profiles_boards')
+      .update({ is_turn: _is_turn })
+      .eq('game_id', _game_id)
+      .eq('player_id', _player_id);
+
+    const { error: er } = await supabase
+      .from('games_profiles_boards')
+      .update({ is_turn: !_is_turn })
+      .eq('game_id', _game_id)
+      .neq('player_id', _player_id);
+
+    if (error || er) return false;
+
+    return true;
   }
 }
 
