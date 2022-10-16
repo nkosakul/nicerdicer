@@ -1,4 +1,5 @@
 <template>
+  <p>Join on this code: {{ gameStore.game?.id || '' }}</p>
   <p>
     <ThePlayer
       ref="playerOne"
