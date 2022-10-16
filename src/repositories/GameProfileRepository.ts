@@ -1,3 +1,4 @@
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import type { GameUser } from '../d';
 import { supabase } from '../supabase';
 import GameProfileBoardRepository from './GameProfileBoardRepository';
@@ -93,12 +94,12 @@ class GameProfileRepository {
     if (host_id === _joiner_id) return true;
 
     if (joiner_id === null) {
+      await GameProfileBoardRepository.initBoard(_joiner_id, _game_id, false);
+
       const { error } = await supabase
         .from('games_profiles')
         .update({ joiner_id: _joiner_id })
         .eq('game_id', _game_id);
-
-      await GameProfileBoardRepository.initBoard(_joiner_id, _game_id, false);
 
       if (!error) return true;
     }
@@ -129,6 +130,30 @@ class GameProfileRepository {
     if (host === _user_id) return joiner;
 
     return false;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  subscribeJoiner(_game_id: string | undefined, thus: any, callback: any) {
+    supabase
+      .channel('public:games_profiles')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'games_profiles',
+        },
+        (
+          payload: RealtimePostgresChangesPayload<{
+            [key: string]: unknown;
+          }>
+        ) => {
+          if (payload.new) {
+            callback(thus, payload.new);
+          }
+        }
+      )
+      .subscribe();
   }
 }
 

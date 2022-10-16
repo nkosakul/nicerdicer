@@ -11,7 +11,11 @@ class GameProfileBoardRepo {
       {
         game_id: _game_id,
         player_id: _player_id,
-        board: null,
+        board: [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+        ],
         is_turn: _is_turn,
       },
     ]);

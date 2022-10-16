@@ -27,8 +27,9 @@ import ProfileRepository from '@/repositories/ProfileRepository';
 import { useGameStore } from '@/stores/gameStore';
 import { defineComponent } from 'vue';
 import type { User } from '@supabase/supabase-js';
-import type { Profile } from '@/d';
+import type { GameUser, Profile } from '@/d';
 import GameProfileBoardRepository from '@/repositories/GameProfileBoardRepository';
+import GameProfileRepository from '@/repositories/GameProfileRepository';
 
 export default defineComponent({
   name: 'TheWorld',
@@ -87,10 +88,25 @@ export default defineComponent({
 
       this.otherPlayerTurn = !this.localPlayerTurn;
     },
+    subscribeJoiner() {
+      GameProfileRepository.subscribeJoiner(
+        this.gameStore.game?.id,
+        this,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        async function callbackFunciton(thus: any, joiner: GameUser) {
+          if (joiner.joiner_id) {
+            await thus.fetchOtherPlayer();
+          }
+        }
+      );
+    },
   },
   async created() {
     await this.fetchOtherPlayer();
     await this.fetchPlayersTurns();
+  },
+  mounted() {
+    this.subscribeJoiner();
   },
 });
 </script>
