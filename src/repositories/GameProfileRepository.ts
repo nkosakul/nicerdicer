@@ -42,6 +42,15 @@ class GameProfileRepository {
     _deleter_id: string | undefined
   ): Promise<boolean | null> {
     if (_deleter_id == typeof undefined) return null;
+
+    const { data: isOwner } = await supabase
+      .from('games_profiles')
+      .select('host_id')
+      .eq('host_id', _deleter_id)
+      .eq('game_id', _gameId);
+
+    if (isOwner && isOwner?.length < 1) return false;
+
     const board_delete = await GameProfileBoardRepository.delete(_gameId);
 
     if (!board_delete) return false;

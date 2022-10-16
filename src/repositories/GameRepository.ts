@@ -24,6 +24,7 @@ class GameRepository {
       _gameId,
       _deleter_id
     );
+
     if (!isDeleted) {
       return {
         message: 'You have to be the host to delete',
@@ -34,6 +35,7 @@ class GameRepository {
     }
 
     const { error } = await supabase.from('games').delete().eq('id', _gameId);
+
     return error;
   }
 
