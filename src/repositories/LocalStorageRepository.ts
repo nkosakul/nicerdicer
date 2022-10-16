@@ -1,6 +1,9 @@
 import type { Game, LocalStorageSession } from '@/d';
 import { useGameStore } from '@/stores/gameStore';
 
+const defaultLocalKey = `sb-${
+  new URL(import.meta.env.VITE_SUPABASE_BASE_URL).hostname.split('.')[0]
+}-auth-token`;
 class LocalStorageRepository {
   getLocalGame(): Game | null {
     const game = localStorage.getItem('supabase_games');
@@ -17,7 +20,7 @@ class LocalStorageRepository {
   }
 
   getLocalUserSession(): LocalStorageSession | null {
-    const session = localStorage.getItem('supabase.auth.token');
+    const session = localStorage.getItem(defaultLocalKey);
     return session ? JSON.parse(session) : null;
   }
 }

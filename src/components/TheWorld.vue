@@ -43,7 +43,7 @@ export default defineComponent({
   computed: {
     localPlayer(): User | null {
       const localSession = LocalStorageRepository.getLocalUserSession();
-      const localSessionUser = localSession?.currentSession?.user || null;
+      const localSessionUser = localSession?.user || null;
 
       return localSessionUser;
     },

@@ -14,5 +14,5 @@ export interface GameUser {
 }
 
 export interface LocalStorageSession {
-  currentSession: Record<'user', User>;
+  user: User;
 }
