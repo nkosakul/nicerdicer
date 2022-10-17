@@ -30,3 +30,13 @@ body {
 .disabled-buttons {
   @apply focus:outline-none focus:ring-0 pointer-events-none opacity-60;
 }
+
+@media (min-width: 50px) {
+  table {
+    display: inline-table !important;
+  }
+
+  thead tr:not(:first-child) {
+    display: none;
+  }
+}

@@ -15,6 +15,7 @@ export interface GameUser {
   game_id: string;
   joiner_id: string;
   other_player_name: string;
+  created_at: string;
 }
 
 export interface LocalStorageSession {

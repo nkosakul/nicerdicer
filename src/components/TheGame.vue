@@ -1,31 +1,103 @@
 <template>
-  <button :disabled="loading || !canCreateGame" @click="createGame">
-    {{ loading ? 'Loading' : 'Create Game' }}
-  </button>
-  <div v-if="!canCreateGame">
-    you have reached the limit, delete some games.
-  </div>
-  <br />
-  <input
-    v-model="joinLink"
-    class="inputField"
-    type="text"
-    placeholder="Game URL"
-  />
-  <button @click="joinGame(joinLink)">Join Game</button>
-  <br />
-  <div>{{ gameLink !== '' ? 'find the game over: ... ' + gameLink : '' }}</div>
-
-  <div>List Of Games:</div>
-  <div v-for="(game, index) in listOfGames" :key="index">
-    {{ game.game_id }}, {{ game.other_player_name }}
-    <button @click="deleteGame(game.game_id)">Delete Game</button>
-    <button @click="joinGame(game.game_id)">Join Game</button>
+  <div class="flex items-center justify-start min-h-full">
+    <div class="container w-full px-8 py-6 text-left bg-white shadow-lg">
+      <!-- List of games -->
+      <div class="">
+        <table
+          class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5"
+        >
+          <thead class="border-b">
+            <tr
+              class="flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0"
+            >
+              <th class="font-medium text-inherit px-4 py4 text-left">
+                Created at
+              </th>
+              <th class="font-medium text-inherit px-4 py4 text-left">
+                Opponent
+              </th>
+              <th class="font-medium text-inherit px-4 py4 text-left">Code</th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody class="flex-1 sm:flex-none">
+            <tr
+              v-for="(game, index) in listOfGames"
+              :key="index"
+              class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0"
+              :class="game.game_id == localGameLink ? 'bg-gray-300' : ''"
+            >
+              <td class="px-4 py-4 whitespace-nowrap">
+                {{ formatDate(game.created_at) }}
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap" link="{{ game.game_id }}">
+                {{ game.other_player_name || 'share code >>' }}
+              </td>
+              <td
+                class="px-4 py-4 whitespace-nowrap"
+                link="{{ game.game_id }}"
+                @click="shareLink(game.game_id)"
+              >
+                <button
+                  class="bg-green-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-gray-200 dark:text-gray-800 dark:hover:bg-gray-300"
+                >
+                  {{ shortenLink(game.game_id) }}
+                </button>
+              </td>
+              <td>
+                <button
+                  class="bg-green-100 hover:bg-green-200 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-800 dark:hover:bg-green-300"
+                  @click="joinGame(game.game_id)"
+                >
+                  Join
+                </button>
+              </td>
+              <td>
+                <button
+                  class="bg-red-100 hover:bg-red-200 text-red-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-red-200 dark:text-red-800 dark:hover:bg-red-300"
+                  @click="deleteGame(game.game_id)"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Creating -->
+      <div>
+        <div class="flex space-x-1 justify-end">
+          <button
+            class="buttons"
+            :class="!canCreateGame ? 'disabled-buttons' : ''"
+            :disabled="loading || !canCreateGame"
+            @click="createGame"
+          >
+            {{ loading ? 'Loading' : 'Create Game' }}
+          </button>
+        </div>
+        <div v-if="!canCreateGame" class="text-xs flex space-x-1 justify-end">
+          you have reached the limit, delete some games.
+        </div>
+      </div>
+      <!-- Joining -->
+      <div class="mt-2">
+        <label class="labels"> Join with link</label>
+        <input
+          v-model="joinLink"
+          class="input-fields"
+          type="text"
+          placeholder="Game URL"
+        />
+        <button class="buttons" @click="joinGame(joinLink)">Join Game</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import type { Game, GameUser } from '@/d';
+import type { GameUser } from '@/d';
 import { useGameStore } from '@/stores/gameStore';
 import { defineComponent } from 'vue';
 import GameRepository from '@/repositories/GameRepository';
@@ -37,13 +109,18 @@ export default defineComponent({
   data() {
     return {
       listOfGames: [] as Array<GameUser>,
-      gameLink: '',
       loading: false,
       canCreateGame: true,
       localStorageGame: '',
       joinLink: '',
       gameStore: useGameStore(),
     };
+  },
+  computed: {
+    localGameLink() {
+      const game = LocalStorageRepository.getLocalGame();
+      return game?.id ?? '';
+    },
   },
   methods: {
     async createGame() {
@@ -65,7 +142,6 @@ export default defineComponent({
               userId
             );
             if (error) throw error;
-            this.gameLink = this.gameStore.game?.url || '';
           }
           LocalStorageRepository.setLocalGame();
         }
@@ -91,10 +167,6 @@ export default defineComponent({
 
       return;
     },
-    getLocalGame(): Game | null {
-      // local game in storage
-      return LocalStorageRepository.getLocalGame();
-    },
     async deleteGame(_game_id: string) {
       try {
         // todo delete from database
@@ -105,7 +177,6 @@ export default defineComponent({
         if (error) throw error;
         this.gameStore.setGame(null);
         LocalStorageRepository.deleteLocalGame();
-        this.gameLink = '';
 
         this.refreshList();
         this.refreshCanCreateGame();
@@ -138,6 +209,23 @@ export default defineComponent({
         this.joinGame(url[1]);
         window.location.href = window.location.origin;
       }
+    },
+    formatDate(date: string) {
+      const dateObj = new Date(date);
+      const year = dateObj.getFullYear();
+      const month = dateObj.getMonth();
+      const day = dateObj.getDay();
+      const hour = dateObj.getHours();
+      const minutes = dateObj.getMinutes();
+
+      return `${hour}:${minutes} ${day}-${month}-${year}`;
+    },
+    shareLink(link: string) {
+      navigator.clipboard.writeText(link);
+      alert('link is copied!');
+    },
+    shortenLink(link: string) {
+      return link.split('-')[0];
     },
   },
   async created() {

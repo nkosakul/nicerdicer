@@ -26,6 +26,6 @@ supabase.auth.onAuthStateChange(async (event, session) => {
   }
 
   if (event === 'SIGNED_OUT') {
-    gameStore.setUser(null);
+    gameStore.resetGameStore();
   }
 });
