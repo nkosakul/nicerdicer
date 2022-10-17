@@ -28,9 +28,9 @@
 import type { Game, GameUser } from '@/d';
 import { useGameStore } from '@/stores/gameStore';
 import { defineComponent } from 'vue';
-import GameRepository from '../repositories/GameRepository';
-import GameProfileRepository from '../repositories/GameProfileRepository';
-import LocalStorageRepository from '../repositories/LocalStorageRepository';
+import GameRepository from '@/repositories/GameRepository';
+import GameProfileRepository from '@/repositories/GameProfileRepository';
+import LocalStorageRepository from '@/repositories/LocalStorageRepository';
 
 export default defineComponent({
   name: 'TheGame',

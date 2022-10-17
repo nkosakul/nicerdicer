@@ -4,7 +4,7 @@ import {
   removeTheVoid,
   rotateNestedArray,
   sumColumn,
-} from '../../helpers/common';
+} from '@/helpers/common';
 
 describe('test summing up column counts', () => {
   it('it should sum distinct counts', () => {

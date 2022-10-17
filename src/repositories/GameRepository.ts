@@ -1,6 +1,6 @@
 import { supabase } from '@/supabase';
 import type { PostgrestError } from '@supabase/supabase-js';
-import GameProfileRepository from './GameProfileRepository';
+import GameProfileRepository from '@/repositories/GameProfileRepository';
 
 class GameRepository {
   async insertGame() {

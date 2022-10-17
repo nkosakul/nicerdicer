@@ -1,5 +1,5 @@
 import { supabase } from '@/supabase';
-import GameProfileRepository from './GameProfileRepository';
+import GameProfileRepository from '@/repositories/GameProfileRepository';
 
 class ProfileRepository {
   async getProfile(_userId: string | undefined) {

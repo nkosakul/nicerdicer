@@ -1,7 +1,7 @@
 import { createClient, type User } from '@supabase/supabase-js';
 import { useGameStore } from '@/stores/gameStore';
-import ProfileRepository from './repositories/ProfileRepository';
-import type { Profile } from './d';
+import ProfileRepository from '@/repositories/ProfileRepository';
+import type { Profile } from '@/d';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_BASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;

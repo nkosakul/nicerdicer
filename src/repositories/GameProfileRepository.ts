@@ -1,8 +1,8 @@
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
-import type { GameUser } from '../d';
-import { supabase } from '../supabase';
-import GameProfileBoardRepository from './GameProfileBoardRepository';
-import ProfileRepository from './ProfileRepository';
+import type { GameUser } from '@/d';
+import { supabase } from '@/supabase';
+import GameProfileBoardRepository from '@/repositories/GameProfileBoardRepository';
+import ProfileRepository from '@/repositories/ProfileRepository';
 
 class GameProfileRepository {
   async listGames(_userId: string | undefined): Promise<GameUser[]> {
