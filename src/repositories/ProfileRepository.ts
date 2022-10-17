@@ -32,6 +32,29 @@ class ProfileRepository {
 
     return data;
   }
+
+  async signIn(email: string, password: string) {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email + '@xx.xxx',
+      password: password,
+    });
+
+    if (error) alert(error);
+  }
+
+  async signUp(email: string, password: string) {
+    const {
+      error,
+      data: { user: user },
+    } = await supabase.auth.signUp({
+      email: email + '@xx.xxx',
+      password: password,
+    });
+
+    if (error) alert(error);
+
+    return user;
+  }
 }
 
 export default new ProfileRepository();

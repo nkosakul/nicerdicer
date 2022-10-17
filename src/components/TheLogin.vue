@@ -55,72 +55,36 @@
 </template>
 
 <script lang="ts">
-import { useGameStore } from '@/stores/gameStore';
 import { ref } from 'vue';
-import { supabase } from '@/supabase';
+import ProfileRepository from '@/repositories/ProfileRepository';
 
 export default {
   setup() {
-    const gameStore = useGameStore();
     const loading = ref(false);
     const name = ref('');
     const password = ref('');
     const loginName = ref('');
     const loginPassword = ref('');
 
+    const signIn = async (name: string, password: string) => {
+      return await ProfileRepository.signIn(name, password);
+    };
+
     const handleLogin = async () => {
-      // try to login
-      try {
-        loading.value = true;
-
-        const {
-          data: { user: user },
-          error: er,
-        } = await supabase.auth.signInWithPassword({
-          email: loginName.value + '@xx.xxx',
-          password: loginPassword.value,
-        });
-
-        if (er) {
-          throw er;
-        }
-
-        gameStore.setUser(user);
-      } catch (error) {
-        const e = error as Error;
-        alert(e.message);
-      } finally {
-        loading.value = false;
-      }
+      loading.value = true;
+      await signIn(loginName.value, loginPassword.value);
+      loading.value = false;
     };
 
     const handleSignUp = async () => {
-      try {
-        // todo implement honey pot
-        const { data: data, error: error } = await supabase.auth.signUp({
-          email: name.value + '@xx.xxx',
-          password: password.value,
-        });
-        if (error) throw error;
+      loading.value = true;
+      // todo implement honey pot
+      const user = await ProfileRepository.signUp(name.value, password.value);
 
-        if (data && 'refresh_token' in data) {
-          const {
-            data: { user: user },
-          } = await supabase.auth.signInWithPassword({
-            email: loginName.value + '@xx.xxx',
-            password: loginPassword.value,
-          });
-          gameStore.setUser(user);
-          return;
-        }
-
-        // todo when it returns a user.
-      } catch (error) {
-        const e = error as Error;
-        alert(e.message);
-      } finally {
-        loading.value = false;
+      if (user && 'refresh_token' in user) {
+        await signIn(name.value, password.value);
       }
+      loading.value = false;
     };
 
     return {
