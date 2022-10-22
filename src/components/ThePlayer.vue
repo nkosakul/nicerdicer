@@ -56,7 +56,6 @@ export default defineComponent({
         [0, 0, 0],
         [0, 0, 0],
       ] as Array<Array<number>>,
-      sum: 0 as number,
       selectedCol: 0 as number,
       columnOneSum: 0 as number,
       columnTwoSum: 0 as number,
@@ -64,41 +63,9 @@ export default defineComponent({
       gameStore: useGameStore(),
     };
   },
-  methods: {
-    // roll the dice and set rolledValue
-    roll(): number {
-      if (this.isPlayerTurn && this.rolledValue === 0 && this.otherPlayer) {
-        this.rolledValue = randomize();
-
-        return this.rolledValue;
-      }
-
-      return this.rolledValue;
-    },
-    // emitted by the board, pushInCol, reset, calculateSum
-    setBoardFromChild(_column: number) {
-      const success = this.pushInCol(_column);
-
-      if (success) {
-        this.reset();
-        this.calculateSum();
-        this.syncBoard();
-        this.syncTurn();
-      }
-    },
-    // push dice in column array
-    pushInCol(_col: number): boolean {
-      if (this.board[_col].length !== 3 && this.rolledValue !== 0) {
-        this.board[_col].push(this.rolledValue);
-        this.rotatedBoard = rotateNestedArray(this.board);
-        return true;
-      }
-
-      return false;
-    },
-    // calculate sum, by column then reduce to all board
-    calculateSum(): number {
-      return (this.sum = this.board
+  computed: {
+    sum(): number {
+      return this.board
         .map((column: number[], index: number) => {
           // [number => count]
           const map_number_count: number[] = countOccurencesInArray(column);
@@ -119,7 +86,39 @@ export default defineComponent({
         })
         .reduce((acc, _count) => {
           return acc + _count;
-        }, 0));
+        }, 0);
+    },
+  },
+  methods: {
+    // roll the dice and set rolledValue
+    roll(): number {
+      if (this.isPlayerTurn && this.rolledValue === 0 && this.otherPlayer) {
+        this.rolledValue = randomize();
+
+        return this.rolledValue;
+      }
+
+      return this.rolledValue;
+    },
+    // emitted by the board, pushInCol, reset, calculateSum
+    setBoardFromChild(_column: number) {
+      const success = this.pushInCol(_column);
+
+      if (success) {
+        this.reset();
+        this.syncBoard();
+        this.syncTurn();
+      }
+    },
+    // push dice in column array
+    pushInCol(_col: number): boolean {
+      if (this.board[_col].length !== 3 && this.rolledValue !== 0) {
+        this.board[_col].push(this.rolledValue);
+        this.rotatedBoard = rotateNestedArray(this.board);
+        return true;
+      }
+
+      return false;
     },
     // reset the dice
     reset() {
@@ -131,7 +130,6 @@ export default defineComponent({
       this.rotatedBoard = rotateNestedArray(_board);
       // remove the zeros from the orignal
       this.board = removeTheVoid(_board);
-      this.calculateSum();
     },
     async fetchBoard() {
       if (this.player === null) return false;
