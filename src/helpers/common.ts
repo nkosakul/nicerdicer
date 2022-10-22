@@ -40,7 +40,7 @@ export function rotateNestedArray(_board: number[][]): number[][] {
 }
 
 // remove zeroes from the board
-export function removeTheVoid(_board: number[][]) {
+export function removeTheVoid(_board: number[][]): number[][] {
   return _board.map(col => col.filter(r => r > 0));
 }
 

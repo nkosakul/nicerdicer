@@ -94,7 +94,7 @@ class GameProfileBoardRepo {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  subscribeBoard(_player_id: string, thus: any, callback: any) {
+  subscribeBoard(thus: any, callback: any) {
     supabase
       .channel('public:games_profiles_boards')
       .on(

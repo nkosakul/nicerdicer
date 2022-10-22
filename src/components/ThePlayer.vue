@@ -13,12 +13,11 @@ import GameProfileBoardRepository from '@/repositories/GameProfileBoardRepositor
 import { randomize } from '@/helpers/common';
 import { defineComponent } from 'vue';
 import { useGameStore } from '@/stores/gameStore';
-import type { BoardSubsctiption, Profile } from '@/d';
+import type { Profile } from '@/d';
 import type { User } from '@supabase/supabase-js';
 
 export default defineComponent({
   name: 'ThePlayer',
-  emits: ['playedMyTurn'],
   components: {
     TheBoard,
   },
@@ -32,11 +31,16 @@ export default defineComponent({
       type: Object as () => (User & Profile) | null,
       default: null,
     },
+    board: {
+      type: Array<Array<number>>,
+      default: function () {
+        return [[], [], []];
+      },
+    },
   },
   data() {
     return {
       rolledValue: 0 as number,
-      board: [[], [], []] as Array<Array<number>>,
       selectedCol: 0 as number,
       gameStore: useGameStore(),
     };
@@ -54,46 +58,34 @@ export default defineComponent({
     },
     // emitted by the board, pushInCol, reset, calculateSum
     setBoardFromChild(_column: number) {
-      const success = this.pushInCol(_column);
+      const newBoard = this.pushInCol(_column);
 
-      if (success) {
+      if (newBoard.length) {
         this.reset();
-        this.syncBoard();
+        this.syncBoard(newBoard);
         this.syncTurn();
       }
     },
     // push dice in column array
-    pushInCol(_col: number): boolean {
+    pushInCol(_col: number): number[][] {
       if (this.board[_col].length !== 3 && this.rolledValue !== 0) {
-        this.board[_col].push(this.rolledValue);
-        return true;
+        const copy = this.board.slice();
+        copy[_col].push(this.rolledValue);
+        return copy;
       }
 
-      return false;
+      return [];
     },
     // reset the dice
     reset() {
       this.rolledValue = 0;
     },
-    async fetchBoard() {
-      if (this.player === null) return false;
-      if (this.gameStore.game === null) return false;
-
-      const _board = await GameProfileBoardRepository.fetchBoard(
-        this.player.id,
-        this.gameStore.game?.id
-      );
-      if (_board) {
-        this.board = _board;
-      }
-      return true;
-    },
-    async syncBoard() {
+    async syncBoard(_board: number[][]) {
       if (this.gameStore.game === null) return false;
       await GameProfileBoardRepository.updateBoard(
         this.player?.id,
         this.gameStore.game?.id,
-        this.board
+        _board
       );
     },
     async syncTurn() {
@@ -104,33 +96,6 @@ export default defineComponent({
         !this.isPlayerTurn
       );
     },
-    subscribeBoard() {
-      GameProfileBoardRepository.subscribeBoard(
-        this.player.id,
-        this,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        function callbackFunciton(thus: any, board: BoardSubsctiption) {
-          if (board.player_id === thus.player?.id && board.board) {
-            thus.board = board.board;
-            thus.$emit('playedMyTurn', {
-              player: board.player_id,
-              is_turn: board.is_turn,
-            });
-          }
-        }
-      );
-    },
-  },
-  watch: {
-    async player() {
-      await this.fetchBoard();
-    },
-  },
-  async created() {
-    await this.fetchBoard();
-  },
-  mounted() {
-    this.subscribeBoard();
   },
 });
 </script>
