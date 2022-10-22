@@ -99,3 +99,7 @@ export function shiftArray(_arr: number[]): number[] {
 export function fillArray(_arr: number[]): number[] {
   return [0, 0, 0].map((_x, _i) => _arr[_i] ?? 0);
 }
+
+export function fillBoard(_board: number[][]): number[][] {
+  return [[], [], []].map((_, _i) => fillArray(_board[_i]));
+}

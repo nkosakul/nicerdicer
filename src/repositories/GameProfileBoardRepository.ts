@@ -1,5 +1,6 @@
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { supabase } from '@/supabase';
+import { fillBoard, removeTheVoid } from '@/helpers/common';
 
 class GameProfileBoardRepo {
   async initBoard(
@@ -30,7 +31,7 @@ class GameProfileBoardRepo {
 
     if (!data || data.length < 1) return false;
 
-    return data[0]['board'];
+    return removeTheVoid(data[0]['board']);
   }
 
   async updateBoard(
@@ -40,7 +41,7 @@ class GameProfileBoardRepo {
   ) {
     const { error } = await supabase
       .from('games_profiles_boards')
-      .update({ board: _board })
+      .update({ board: fillBoard(_board) })
       .eq('game_id', _game_id)
       .eq('player_id', _player_id);
 

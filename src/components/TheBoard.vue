@@ -13,7 +13,7 @@
           <th style="padding: 5px">{{ columnThreeSum }}</th>
         </tr>
 
-        <tr v-for="(columns, index) in rotatedViewBoard" :key="index">
+        <tr v-for="(columns, index) in viewedBoard" :key="index">
           <td
             v-for="(cell, subindex) in columns"
             :key="subindex"
@@ -32,6 +32,11 @@
 </template>
 
 <script lang="ts">
+import {
+  countOccurencesInArray,
+  rotateNestedArray,
+  sumColumn,
+} from '@/helpers/common';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -39,38 +44,47 @@ export default defineComponent({
   emits: ['setBoardFromChild'],
   props: {
     board: {
-      // data structure is array of arrays with push and pop
+      // data structure is array of arrays
       type: Array<Array<number>>,
       default: function () {
         return [[], [], []];
       },
     },
-    rotatedViewBoard: {
-      // data structure is array of arrays with push and pop
-      type: Array<Array<number>>,
-      default: function () {
-        return [
-          [0, 0, 0],
-          [0, 0, 0],
-          [0, 0, 0],
-        ];
-      },
+  },
+  data() {
+    return {
+      columnOneSum: 0,
+      columnTwoSum: 0,
+      columnThreeSum: 0,
+    };
+  },
+  computed: {
+    viewedBoard(): number[][] {
+      return rotateNestedArray(this.board);
     },
-    sum: {
-      type: [Number],
-      default: 0,
-    },
-    columnOneSum: {
-      type: Number,
-      default: 0,
-    },
-    columnTwoSum: {
-      type: Number,
-      default: 0,
-    },
-    columnThreeSum: {
-      type: Number,
-      default: 0,
+    sum(): number {
+      return this.board
+        .map((column: number[], index: number) => {
+          // [number => count]
+          const map_number_count: number[] = countOccurencesInArray(column);
+          const columnSum = sumColumn(map_number_count);
+
+          // set columns sums
+          if (index === 0) {
+            this.columnOneSum = columnSum;
+          }
+          if (index === 1) {
+            this.columnTwoSum = columnSum;
+          }
+          if (index === 2) {
+            this.columnThreeSum = columnSum;
+          }
+
+          return columnSum;
+        })
+        .reduce((acc, _count) => {
+          return acc + _count;
+        }, 0);
     },
   },
   methods: {

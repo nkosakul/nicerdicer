@@ -4,27 +4,13 @@
   <div style="padding: 5px">{{ rolledValue }}</div>
   <div class="dice"></div>
 
-  <TheBoard
-    :board="board"
-    :rotated-view-board="rotatedBoard"
-    :sum="sum"
-    :column-one-sum="columnOneSum"
-    :column-two-sum="columnTwoSum"
-    :column-three-sum="columnThreeSum"
-    @set-board-from-child="setBoardFromChild"
-  />
+  <TheBoard :board="board" @set-board-from-child="setBoardFromChild" />
 </template>
 
 <script lang="ts">
 import TheBoard from '@/components/TheBoard.vue';
 import GameProfileBoardRepository from '@/repositories/GameProfileBoardRepository';
-import {
-  countOccurencesInArray,
-  randomize,
-  removeTheVoid,
-  rotateNestedArray,
-  sumColumn,
-} from '@/helpers/common';
+import { randomize } from '@/helpers/common';
 import { defineComponent } from 'vue';
 import { useGameStore } from '@/stores/gameStore';
 import type { BoardSubsctiption, Profile } from '@/d';
@@ -51,43 +37,9 @@ export default defineComponent({
     return {
       rolledValue: 0 as number,
       board: [[], [], []] as Array<Array<number>>,
-      rotatedBoard: [
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-      ] as Array<Array<number>>,
       selectedCol: 0 as number,
-      columnOneSum: 0 as number,
-      columnTwoSum: 0 as number,
-      columnThreeSum: 0 as number,
       gameStore: useGameStore(),
     };
-  },
-  computed: {
-    sum(): number {
-      return this.board
-        .map((column: number[], index: number) => {
-          // [number => count]
-          const map_number_count: number[] = countOccurencesInArray(column);
-          const columnSum = sumColumn(map_number_count);
-
-          // set columns sums
-          if (index === 0) {
-            this.columnOneSum = columnSum;
-          }
-          if (index === 1) {
-            this.columnTwoSum = columnSum;
-          }
-          if (index === 2) {
-            this.columnThreeSum = columnSum;
-          }
-
-          return columnSum;
-        })
-        .reduce((acc, _count) => {
-          return acc + _count;
-        }, 0);
-    },
   },
   methods: {
     // roll the dice and set rolledValue
@@ -114,7 +66,6 @@ export default defineComponent({
     pushInCol(_col: number): boolean {
       if (this.board[_col].length !== 3 && this.rolledValue !== 0) {
         this.board[_col].push(this.rolledValue);
-        this.rotatedBoard = rotateNestedArray(this.board);
         return true;
       }
 
@@ -123,13 +74,6 @@ export default defineComponent({
     // reset the dice
     reset() {
       this.rolledValue = 0;
-    },
-    // set board
-    setBoard(_board: number[][]) {
-      // rotating the original to get the rotated view
-      this.rotatedBoard = rotateNestedArray(_board);
-      // remove the zeros from the orignal
-      this.board = removeTheVoid(_board);
     },
     async fetchBoard() {
       if (this.player === null) return false;
@@ -140,18 +84,16 @@ export default defineComponent({
         this.gameStore.game?.id
       );
       if (_board) {
-        this.setBoard(_board);
+        this.board = _board;
       }
       return true;
     },
     async syncBoard() {
       if (this.gameStore.game === null) return false;
-      // rotating the rotated to get the original
-      const db_board = rotateNestedArray(this.rotatedBoard);
       await GameProfileBoardRepository.updateBoard(
         this.player?.id,
         this.gameStore.game?.id,
-        db_board
+        this.board
       );
     },
     async syncTurn() {
@@ -169,7 +111,7 @@ export default defineComponent({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         function callbackFunciton(thus: any, board: BoardSubsctiption) {
           if (board.player_id === thus.player?.id && board.board) {
-            thus.setBoard(board.board);
+            thus.board = board.board;
             thus.$emit('playedMyTurn', {
               player: board.player_id,
               is_turn: board.is_turn,
