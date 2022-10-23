@@ -3,12 +3,13 @@
     <div class="container w-full px-8 py-6 text-left bg-white shadow-lg">
       <!-- List of games -->
       <div class="">
+        <label class="labels">Your list of games:</label>
         <table
           class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5"
         >
           <thead class="border-b">
             <tr
-              class="flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0"
+              class="flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0 hidden"
             >
               <th class="font-medium text-inherit px-4 py4 text-left">
                 Created at
@@ -28,34 +29,34 @@
               class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0"
               :class="game.game_id == localGameLink ? 'bg-gray-300' : ''"
             >
-              <td class="px-4 py-4 whitespace-nowrap">
-                {{ formatDate(game.created_at) }}
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap" link="{{ game.game_id }}">
+              <td
+                class="border-grey-light border sm:border-none p-3"
+                link="{{ game.game_id }}"
+              >
                 {{ game.other_player_name || 'share code >>' }}
               </td>
               <td
-                class="px-4 py-4 whitespace-nowrap"
+                class="border-grey-light border sm:border-none p-3"
                 link="{{ game.game_id }}"
                 @click="shareLink(game.game_id)"
               >
                 <button
-                  class="bg-green-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-gray-200 dark:text-gray-800 dark:hover:bg-gray-300"
+                  class="bg-green-100 text-gray-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-gray-200 dark:text-gray-800 dark:hover:bg-gray-300"
                 >
                   {{ shortenLink(game.game_id) }}
                 </button>
               </td>
-              <td>
+              <td class="border-grey-light border sm:border-none p-3">
                 <button
-                  class="bg-green-100 hover:bg-green-200 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-800 dark:hover:bg-green-300"
+                  class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-800 dark:hover:bg-green-300"
                   @click="joinGame(game.game_id)"
                 >
                   Join
                 </button>
               </td>
-              <td>
+              <td class="border-grey-light border sm:border-none p-3">
                 <button
-                  class="bg-red-100 hover:bg-red-200 text-red-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-red-200 dark:text-red-800 dark:hover:bg-red-300"
+                  class="bg-red-100 text-red-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-red-200 dark:text-red-800 dark:hover:bg-red-300"
                   @click="deleteGame(game.game_id)"
                 >
                   Delete
@@ -83,7 +84,7 @@
       </div>
       <!-- Joining -->
       <div class="mt-2">
-        <label class="labels"> Join with link</label>
+        <label class="labels">Join with link</label>
         <input
           v-model="joinLink"
           class="input-fields"

@@ -31,7 +31,7 @@ body {
   @apply focus:outline-none focus:ring-0 pointer-events-none opacity-60;
 }
 
-@media (min-width: 50px) {
+@media (min-width: 640px) {
   table {
     display: inline-table !important;
   }

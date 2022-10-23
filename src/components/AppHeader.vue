@@ -13,6 +13,14 @@
               Logout
             </button>
           </li>
+          <li>
+            <button
+              v-if="gameStore.game !== null"
+              @click="gameStore.setGame(null)"
+            >
+              Leave Game
+            </button>
+          </li>
         </ul>
       </nav>
     </div>
