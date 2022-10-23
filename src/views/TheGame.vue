@@ -2,6 +2,9 @@
   <TheGame v-if="gameStore.user !== null && gameStore.game === null" />
   <TheWorld v-if="gameStore.user !== null && gameStore.game !== null" />
   <TheLogin v-if="gameStore.user === null" />
+  <button v-if="gameStore.game !== null" @click="gameStore.setGame(null)">
+    Leave Game
+  </button>
   <button v-if="gameStore.user !== null" @click="supabase.auth.signOut()">
     Logout
   </button>
