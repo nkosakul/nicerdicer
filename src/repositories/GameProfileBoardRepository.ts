@@ -50,7 +50,7 @@ class GameProfileBoardRepo {
       .eq('game_id', _game_id)
       .neq('player_id', _player_id);
 
-    if (!otherPlayer[0]['board']) return false;
+    if (!otherPlayer) return false;
 
     const otherPlayerNewBoard = playerAttackOnSubArr(
       _board,

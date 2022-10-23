@@ -129,14 +129,26 @@ export default defineComponent({
           if (!board.board) return;
 
           if (board.player_id === thus.localPlayer.id) {
+            if (board.is_turn != thus.localPlayerTurn) {
+              // it is a turn update
+              thus.playedMyTurn(board.player_id, board.is_turn);
+              return;
+            }
+            // it is a board update
             thus.localBoard = removeTheVoid(board.board);
+            return;
           }
 
           if (board.player_id === thus.otherPlayer.id) {
+            if (board.is_turn != thus.otherPlayerTurn) {
+              // it is a turn update
+              thus.playedMyTurn(board.player_id, board.is_turn);
+              return;
+            }
+            // it is a board update
             thus.otherBoard = removeTheVoid(board.board);
+            return;
           }
-
-          thus.playedMyTurn(board.player_id, board.is_turn);
         }
       );
     },
