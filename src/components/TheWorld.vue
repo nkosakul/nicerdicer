@@ -100,13 +100,16 @@ export default defineComponent({
         this.localBoard = localBoard;
       }
 
-      const otherBoard = await GameProfileBoardRepository.fetchBoard(
-        this.otherPlayer?.id || '',
-        this.gameStore.game?.id
-      );
-      if (otherBoard) {
-        this.otherBoard = otherBoard;
+      if (this.otherPlayer) {
+        const otherBoard = await GameProfileBoardRepository.fetchBoard(
+          this.otherPlayer.id,
+          this.gameStore.game?.id
+        );
+        if (otherBoard) {
+          this.otherBoard = otherBoard;
+        }
       }
+
       return true;
     },
     subscribeJoiner() {
@@ -117,6 +120,7 @@ export default defineComponent({
         async function callbackFunciton(thus: any, joiner: GameUser) {
           if (joiner.joiner_id) {
             await thus.fetchOtherPlayer();
+            await thus.fetchBoards();
           }
         }
       );
