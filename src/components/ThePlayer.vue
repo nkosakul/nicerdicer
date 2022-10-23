@@ -62,7 +62,7 @@ export default defineComponent({
 
       if (newBoard.length) {
         this.reset();
-        this.syncBoard(newBoard);
+        this.syncBoard(newBoard, _column);
         this.syncTurn();
       }
     },
@@ -80,12 +80,13 @@ export default defineComponent({
     reset() {
       this.rolledValue = 0;
     },
-    async syncBoard(_board: number[][]) {
+    async syncBoard(_board: number[][], _column: number) {
       if (this.gameStore.game === null) return false;
       await GameProfileBoardRepository.updateBoard(
         this.player?.id,
         this.gameStore.game?.id,
-        _board
+        _board,
+        _column
       );
     },
     async syncTurn() {

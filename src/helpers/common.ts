@@ -52,8 +52,8 @@ export function playerAttackOnSubArr(
   _attacker_board: number[][],
   _defender_board: number[][],
   _index: number
-): number[][] | boolean {
-  if (_index > 2 || _index < 0) return false;
+): number[][] {
+  if (_index > 2 || _index < 0) throw Error;
 
   // get sub arrays
   const attackerSubArray = _attacker_board[_index];

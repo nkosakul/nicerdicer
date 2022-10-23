@@ -1,6 +1,10 @@
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { supabase } from '@/supabase';
-import { fillBoard, removeTheVoid } from '@/helpers/common';
+import {
+  fillBoard,
+  removeTheVoid,
+  playerAttackOnSubArr,
+} from '@/helpers/common';
 
 class GameProfileBoardRepo {
   async initBoard(
@@ -37,15 +41,38 @@ class GameProfileBoardRepo {
   async updateBoard(
     _player_id: string,
     _game_id: string,
-    _board: Array<Array<number>>
+    _board: Array<Array<number>>,
+    _column: number
   ) {
+    const { data: otherPlayer } = await supabase
+      .from('games_profiles_boards')
+      .select('board,player_id')
+      .eq('game_id', _game_id)
+      .neq('player_id', _player_id);
+
+    if (!otherPlayer[0]['board']) return false;
+
+    const otherPlayerNewBoard = playerAttackOnSubArr(
+      _board,
+      fillBoard(otherPlayer[0]['board']),
+      _column
+    );
+
     const { error } = await supabase
       .from('games_profiles_boards')
       .update({ board: fillBoard(_board) })
       .eq('game_id', _game_id)
       .eq('player_id', _player_id);
 
-    if (error) return false;
+    if (error) throw error;
+
+    const { error: err } = await supabase
+      .from('games_profiles_boards')
+      .update({ board: fillBoard(otherPlayerNewBoard) })
+      .eq('game_id', _game_id)
+      .eq('player_id', otherPlayer[0]['player_id']);
+
+    if (err) throw err;
 
     return true;
   }

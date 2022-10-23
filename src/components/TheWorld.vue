@@ -129,7 +129,7 @@ export default defineComponent({
           if (!board.board) return;
 
           if (board.player_id === thus.localPlayer.id) {
-            thus.localboard = removeTheVoid(board.board);
+            thus.localBoard = removeTheVoid(board.board);
           }
 
           if (board.player_id === thus.otherPlayer.id) {
