@@ -31,7 +31,8 @@ import type { User } from '@supabase/supabase-js';
 import type { BoardSubsctiption, GameUser, Profile } from '@/d';
 import GameProfileBoardRepository from '@/repositories/GameProfileBoardRepository';
 import GameProfileRepository from '@/repositories/GameProfileRepository';
-import { removeTheVoid } from '@/helpers/common';
+import { removeTheVoid } from '@/helpers/arrayHelper';
+import { shareLink, shortenLink } from '@/helpers/common';
 
 export default defineComponent({
   name: 'TheWorld',
@@ -155,6 +156,12 @@ export default defineComponent({
           }
         }
       );
+    },
+    shareLink(link: string) {
+      shareLink(link);
+    },
+    shortenLink(link: string) {
+      return shortenLink(link);
     },
   },
   async created() {

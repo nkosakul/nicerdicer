@@ -4,7 +4,7 @@ import {
   fillBoard,
   removeTheVoid,
   playerAttackOnSubArr,
-} from '@/helpers/common';
+} from '@/helpers/arrayHelper';
 
 class GameProfileBoardRepo {
   async initBoard(

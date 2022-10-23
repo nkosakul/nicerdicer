@@ -10,7 +10,7 @@
 <script lang="ts">
 import TheBoard from '@/components/TheBoard.vue';
 import GameProfileBoardRepository from '@/repositories/GameProfileBoardRepository';
-import { randomize } from '@/helpers/common';
+import { randomize } from '@/helpers/arrayHelper';
 import { defineComponent } from 'vue';
 import { useGameStore } from '@/stores/gameStore';
 import type { Profile } from '@/d';

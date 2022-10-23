@@ -104,6 +104,7 @@ import { defineComponent } from 'vue';
 import GameRepository from '@/repositories/GameRepository';
 import GameProfileRepository from '@/repositories/GameProfileRepository';
 import LocalStorageRepository from '@/repositories/LocalStorageRepository';
+import { shareLink, shortenLink } from '@/helpers/common';
 
 export default defineComponent({
   name: 'TheGame',
@@ -222,11 +223,10 @@ export default defineComponent({
       return `${hour}:${minutes} ${day}-${month}-${year}`;
     },
     shareLink(link: string) {
-      navigator.clipboard.writeText(link);
-      alert('link is copied!');
+      shareLink(link);
     },
     shortenLink(link: string) {
-      return link.split('-')[0];
+      return shortenLink(link);
     },
   },
   async created() {

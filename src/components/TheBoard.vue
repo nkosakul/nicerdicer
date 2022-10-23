@@ -36,7 +36,7 @@ import {
   countOccurencesInArray,
   rotateNestedArray,
   sumColumn,
-} from '@/helpers/common';
+} from '@/helpers/arrayHelper';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
