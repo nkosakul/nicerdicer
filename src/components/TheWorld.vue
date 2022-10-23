@@ -1,24 +1,38 @@
 <template>
-  <p>Join on this code: {{ gameStore.game?.id || '' }}</p>
-  <p>
-    <ThePlayer
-      ref="playerOne"
-      :is-player-turn="localPlayerTurn"
-      :board="localBoard"
-      :other-player="otherPlayer"
-      :player="localPlayer"
-    />
-  </p>
-  <hr />
-  <p>
-    <ThePlayer
-      v-if="otherPlayer"
-      ref="playerTwo"
-      :is-player-turn="otherPlayerTurn"
-      :board="otherBoard"
-      :player="otherPlayer"
-    />
-  </p>
+  <div class="flex items-center justify-start min-h-full">
+    <div class="container w-full px-8 py-6 text-left bg-white shadow-lg">
+      <!-- code -->
+      <div class="flex justify-end">
+        <button
+          class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-800 dark:hover:bg-green-300"
+          @click="shareLink(gameStore.game?.id || '')"
+        >
+          Share this link: {{ shortenLink(gameStore.game?.id || '') }}
+        </button>
+      </div>
+      <!-- Player One -->
+      <p>
+        <ThePlayer
+          ref="playerOne"
+          :is-player-turn="localPlayerTurn"
+          :board="localBoard"
+          :other-player="otherPlayer"
+          :player="localPlayer"
+        />
+      </p>
+      <!-- Player Two -->
+      <hr />
+      <p>
+        <ThePlayer
+          v-if="otherPlayer"
+          ref="playerTwo"
+          :is-player-turn="otherPlayerTurn"
+          :board="otherBoard"
+          :player="otherPlayer"
+        />
+      </p>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
