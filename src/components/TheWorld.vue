@@ -4,9 +4,9 @@
     <ThePlayer
       ref="playerOne"
       :is-player-turn="localPlayerTurn"
+      :board="localBoard"
       :other-player="otherPlayer"
       :player="localPlayer"
-      @played-my-turn="playedMyTurn"
     />
   </p>
   <hr />
@@ -15,8 +15,8 @@
       v-if="otherPlayer"
       ref="playerTwo"
       :is-player-turn="otherPlayerTurn"
+      :board="otherBoard"
       :player="otherPlayer"
-      @played-my-turn="playedMyTurn"
     />
   </p>
 </template>
@@ -28,9 +28,10 @@ import ProfileRepository from '@/repositories/ProfileRepository';
 import { useGameStore } from '@/stores/gameStore';
 import { defineComponent } from 'vue';
 import type { User } from '@supabase/supabase-js';
-import type { GameUser, Profile } from '@/d';
+import type { BoardSubsctiption, GameUser, Profile } from '@/d';
 import GameProfileBoardRepository from '@/repositories/GameProfileBoardRepository';
 import GameProfileRepository from '@/repositories/GameProfileRepository';
+import { removeTheVoid } from '@/helpers/common';
 
 export default defineComponent({
   name: 'TheWorld',
@@ -43,6 +44,8 @@ export default defineComponent({
       otherPlayer: null as (User & Profile) | null,
       localPlayerTurn: true,
       otherPlayerTurn: false,
+      localBoard: [[], [], []] as Array<Array<number>>,
+      otherBoard: [[], [], []] as Array<Array<number>>,
     };
   },
   computed: {
@@ -56,16 +59,13 @@ export default defineComponent({
     },
   },
   methods: {
-    async playedMyTurn(data: { player: string; is_turn: boolean }) {
-      const playerId = data.player;
-      const isTurn = data.is_turn;
-
-      if (this.localPlayer.id === playerId) {
-        this.localPlayerTurn = isTurn;
-        this.otherPlayerTurn = !isTurn;
+    async playedMyTurn(player_id: string, is_turn: boolean) {
+      if (this.localPlayer.id === player_id) {
+        this.localPlayerTurn = is_turn;
+        this.otherPlayerTurn = !is_turn;
       } else {
-        this.localPlayerTurn = !isTurn;
-        this.otherPlayerTurn = isTurn;
+        this.localPlayerTurn = !is_turn;
+        this.otherPlayerTurn = is_turn;
       }
     },
     async fetchOtherPlayer() {
@@ -89,6 +89,29 @@ export default defineComponent({
 
       this.otherPlayerTurn = !this.localPlayerTurn;
     },
+    async fetchBoards() {
+      if (this.gameStore.game === null) return false;
+
+      const localBoard = await GameProfileBoardRepository.fetchBoard(
+        this.localPlayer.id,
+        this.gameStore.game?.id
+      );
+      if (localBoard) {
+        this.localBoard = localBoard;
+      }
+
+      if (this.otherPlayer) {
+        const otherBoard = await GameProfileBoardRepository.fetchBoard(
+          this.otherPlayer.id,
+          this.gameStore.game?.id
+        );
+        if (otherBoard) {
+          this.otherBoard = otherBoard;
+        }
+      }
+
+      return true;
+    },
     subscribeJoiner() {
       GameProfileRepository.subscribeJoiner(
         this.gameStore.game?.id,
@@ -97,6 +120,38 @@ export default defineComponent({
         async function callbackFunciton(thus: any, joiner: GameUser) {
           if (joiner.joiner_id) {
             await thus.fetchOtherPlayer();
+            await thus.fetchBoards();
+          }
+        }
+      );
+    },
+    subscribeBoard() {
+      GameProfileBoardRepository.subscribeBoard(
+        this,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        function callbackFunciton(thus: any, board: BoardSubsctiption) {
+          if (!board.board) return;
+
+          if (board.player_id === thus.localPlayer.id) {
+            if (board.is_turn != thus.localPlayerTurn) {
+              // it is a turn update
+              thus.playedMyTurn(board.player_id, board.is_turn);
+              return;
+            }
+            // it is a board update
+            thus.localBoard = removeTheVoid(board.board);
+            return;
+          }
+
+          if (board.player_id === thus.otherPlayer.id) {
+            if (board.is_turn != thus.otherPlayerTurn) {
+              // it is a turn update
+              thus.playedMyTurn(board.player_id, board.is_turn);
+              return;
+            }
+            // it is a board update
+            thus.otherBoard = removeTheVoid(board.board);
+            return;
           }
         }
       );
@@ -105,9 +160,11 @@ export default defineComponent({
   async created() {
     await this.fetchOtherPlayer();
     await this.fetchPlayersTurns();
+    await this.fetchBoards();
   },
   mounted() {
     this.subscribeJoiner();
+    this.subscribeBoard();
   },
 });
 </script>
