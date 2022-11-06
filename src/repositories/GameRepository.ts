@@ -20,20 +20,12 @@ class GameRepository {
     _deleter_id: string | undefined
   ): Promise<PostgrestError | null> {
     if (_deleter_id == typeof undefined) return null;
-    const isDeleted = await GameProfileRepository.deleteRelation(
-      _gameId,
-      _deleter_id
+    const isOwnerOfGame = await GameProfileRepository.isOwnerOfGame(
+      _deleter_id,
+      _gameId
     );
 
-    if (!isDeleted) {
-      return {
-        message: 'You have to be the host to delete',
-        details: '',
-        hint: '',
-        code: '',
-      };
-    }
-
+    if (!isOwnerOfGame) throw Error('Only the host can delete the game.');
     const { error } = await supabase.from('games').delete().eq('id', _gameId);
 
     return error;

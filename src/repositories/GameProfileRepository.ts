@@ -37,9 +37,9 @@ class GameProfileRepository {
     return awaited_list as GameUser[];
   }
 
-  async deleteRelation(
-    _gameId: string,
-    _deleter_id: string | undefined
+  async isOwnerOfGame(
+    _deleter_id: string | undefined,
+    _gameId: string
   ): Promise<boolean | null> {
     if (_deleter_id == typeof undefined) return null;
 
@@ -49,18 +49,9 @@ class GameProfileRepository {
       .eq('host_id', _deleter_id)
       .eq('game_id', _gameId);
 
-    if (isOwner && isOwner?.length < 1) return false;
+    if (!isOwner || isOwner.length < 1) return false;
 
-    const board_delete = await GameProfileBoardRepository.delete(_gameId);
-
-    if (!board_delete) return false;
-
-    const { error } = await supabase
-      .from('games_profiles')
-      .delete()
-      .match({ game_id: _gameId, host_id: _deleter_id });
-
-    return error ? false : true;
+    return true;
   }
 
   async canUserInsertGame(_userId: string | undefined): Promise<boolean> {

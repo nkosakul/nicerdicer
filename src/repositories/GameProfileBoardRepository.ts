@@ -77,15 +77,6 @@ class GameProfileBoardRepo {
     return true;
   }
 
-  async delete(_game_id: string) {
-    const { error } = await supabase
-      .from('games_profiles_boards')
-      .delete()
-      .match({ game_id: _game_id });
-
-    return error ? false : true;
-  }
-
   async fetchTurn(_player_id: string, _game_id: string | undefined) {
     const { data } = await supabase
       .from('games_profiles_boards')
